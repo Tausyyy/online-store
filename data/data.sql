@@ -13,6 +13,7 @@ INSERT INTO customers (
 VALUES
     ('ivan@example.com', 'hash_ivan', '+79990000001', 'customer'),
     ('anna@example.com', 'hash_anna', '+79990000002', 'customer');
+    ('anton@example.com', 'hash_anton', '+79990000003', 'customer');
 
 INSERT INTO products (
     category_id,

@@ -18,7 +18,6 @@ WHERE cu.email = 'ivan@example.com'
 ORDER BY c.cart_id DESC
 LIMIT 1;
 
-
 UPDATE carts
 SET status = 'completed'
 WHERE cart_id = (
@@ -33,7 +32,6 @@ WHERE cart_id = (
 )
 AND status = 'active';
 
-
 SELECT
     c.cart_id,
     c.customer_id,
@@ -46,7 +44,6 @@ JOIN customers cu
 WHERE cu.email = 'ivan@example.com'
 ORDER BY c.cart_id DESC
 LIMIT 1;
-
 
 INSERT INTO carts (
     customer_id,
@@ -66,7 +63,6 @@ VALUES
     CURRENT_TIMESTAMP - INTERVAL '1 day'
 );
 
-
 UPDATE carts
 SET status = 'expired'
 WHERE cart_id = (
@@ -81,7 +77,6 @@ WHERE cart_id = (
     LIMIT 1
 )
 AND status = 'active';
-
 
 SELECT
     c.cart_id,
