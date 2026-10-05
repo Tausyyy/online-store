@@ -7,7 +7,6 @@ BEGIN
     END IF;
 END $$;
 
--- ORDER_ITEMS: restore original FK, constraints and types.
 ALTER TABLE order_items
     DROP CONSTRAINT fk_order_items_sku,
     ADD CONSTRAINT order_items_sku_id_fkey FOREIGN KEY (sku_id) REFERENCES sku (sku_id),
@@ -21,7 +20,6 @@ ALTER TABLE order_items
     ALTER COLUMN sku_id DROP NOT NULL,
     ALTER COLUMN order_id DROP NOT NULL;
 
--- ORDERS: restore original FK, nullability, defaults and VARCHAR lengths.
 ALTER TABLE orders
     DROP CONSTRAINT fk_orders_customer,
     ADD CONSTRAINT orders_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
@@ -36,7 +34,6 @@ ALTER TABLE orders
     ALTER COLUMN status DROP NOT NULL,
     ALTER COLUMN customer_id DROP NOT NULL;
 
--- CART_ITEMS: restore original FK and nullability.
 ALTER TABLE cart_items
     DROP CONSTRAINT fk_cart_items_sku,
     ADD CONSTRAINT cart_items_sku_id_fkey FOREIGN KEY (sku_id) REFERENCES sku (sku_id),
@@ -47,7 +44,6 @@ ALTER TABLE cart_items
     ALTER COLUMN sku_id DROP NOT NULL,
     ALTER COLUMN cart_id DROP NOT NULL;
 
--- CARTS: restore original FK, nullability, defaults and status length.
 ALTER TABLE carts
     DROP CONSTRAINT fk_carts_customer,
     ADD CONSTRAINT carts_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
@@ -58,7 +54,6 @@ ALTER TABLE carts
     ALTER COLUMN status TYPE VARCHAR(50),
     ALTER COLUMN customer_id DROP NOT NULL;
 
--- SKU: restore original FK, constraints, types and nullability.
 ALTER TABLE sku
     DROP CONSTRAINT fk_sku_product,
     ADD CONSTRAINT sku_product_id_fkey FOREIGN KEY (product_id) REFERENCES products (product_id),
@@ -78,7 +73,6 @@ ALTER TABLE sku
     ALTER COLUMN article TYPE VARCHAR(100),
     ALTER COLUMN product_id DROP NOT NULL;
 
--- PRODUCTS: restore original FK, constraints, defaults and types.
 ALTER TABLE products
     DROP CONSTRAINT fk_products_category,
     ADD CONSTRAINT products_category_id_fkey FOREIGN KEY (category_id) REFERENCES categories (category_id),
@@ -89,7 +83,6 @@ ALTER TABLE products
     ALTER COLUMN name DROP NOT NULL,
     ALTER COLUMN category_id DROP NOT NULL;
 
--- CUSTOMERS: restore defaults, nullability and original VARCHAR lengths.
 ALTER TABLE customers
     ALTER COLUMN role DROP DEFAULT,
     ALTER COLUMN role DROP NOT NULL,
@@ -99,8 +92,7 @@ ALTER TABLE customers
     DROP CONSTRAINT customers_email_key,
     ALTER COLUMN email DROP NOT NULL,
     ALTER COLUMN email TYPE VARCHAR(200);
-
--- CATEGORIES: restore uniqueness and nullability/type.
+    
 ALTER TABLE categories
     DROP CONSTRAINT categories_name_key,
     ALTER COLUMN name DROP NOT NULL,

@@ -13,13 +13,11 @@ BEGIN
     END IF;
 END $$;
 
--- 1. CATEGORIES
 ALTER TABLE categories
     ALTER COLUMN name TYPE VARCHAR(100),
     ALTER COLUMN name SET NOT NULL,
     ADD CONSTRAINT categories_name_key UNIQUE (name);
 
--- 2. CUSTOMERS
 ALTER TABLE customers
     ALTER COLUMN email TYPE VARCHAR(255),
     ALTER COLUMN email SET NOT NULL,
@@ -30,7 +28,6 @@ ALTER TABLE customers
     ALTER COLUMN role SET NOT NULL,
     ALTER COLUMN role SET DEFAULT 'customer';
 
--- 3. PRODUCTS
 ALTER TABLE products
     ALTER COLUMN category_id SET NOT NULL,
     ALTER COLUMN name SET NOT NULL,
@@ -45,7 +42,6 @@ ALTER TABLE products
         FOREIGN KEY (category_id) REFERENCES categories (category_id)
         ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- 4. SKU
 ALTER TABLE sku
     ALTER COLUMN product_id SET NOT NULL,
     ALTER COLUMN article TYPE VARCHAR(50),
@@ -69,7 +65,6 @@ ALTER TABLE sku
         FOREIGN KEY (product_id) REFERENCES products (product_id)
         ON DELETE CASCADE ON UPDATE CASCADE;
 
--- 5. CARTS
 ALTER TABLE carts
     ALTER COLUMN customer_id SET NOT NULL,
     ALTER COLUMN status TYPE VARCHAR(30),
@@ -84,7 +79,6 @@ ALTER TABLE carts
         FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
         ON DELETE CASCADE ON UPDATE CASCADE;
 
--- 6. CART_ITEMS
 ALTER TABLE cart_items
     ALTER COLUMN cart_id SET NOT NULL,
     ALTER COLUMN sku_id SET NOT NULL,
@@ -103,7 +97,6 @@ ALTER TABLE cart_items
         FOREIGN KEY (sku_id) REFERENCES sku (sku_id)
         ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- 7. ORDERS
 UPDATE orders
 SET created_at = CURRENT_TIMESTAMP
 WHERE created_at IS NULL;
@@ -121,16 +114,12 @@ ALTER TABLE orders
     ALTER COLUMN created_at SET NOT NULL,
     ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 
--- RESTRICT (не CASCADE): история заказов должна пережить удаление аккаунта.
--- Поэтому в orders и продублированы customer_name/customer_phone — снимок
--- данных на момент заказа (см. README_3NF_денормализация.md).
 ALTER TABLE orders
     DROP CONSTRAINT orders_customer_id_fkey,
     ADD CONSTRAINT fk_orders_customer
         FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
         ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- 8. ORDER_ITEMS
 ALTER TABLE order_items
     ALTER COLUMN order_id SET NOT NULL,
     ALTER COLUMN sku_id SET NOT NULL,
@@ -146,7 +135,6 @@ ALTER TABLE order_items
         FOREIGN KEY (order_id) REFERENCES orders (order_id)
         ON DELETE CASCADE ON UPDATE CASCADE;
 
--- RESTRICT: нельзя потерять данные о товаре из истории заказов.
 ALTER TABLE order_items
     DROP CONSTRAINT order_items_sku_id_fkey,
     ADD CONSTRAINT fk_order_items_sku

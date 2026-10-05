@@ -1,15 +1,3 @@
--- ============================================
--- SKU LIFECYCLE
---
--- Draft -> On Sale -> Out of Stock
--- -> On Sale -> Archived
--- ============================================
-
-
--- ============================================
--- INITIAL STATE
--- ============================================
-
 SELECT
     sku_id,
     article,
@@ -17,11 +5,6 @@ SELECT
     stock_quantity
 FROM sku
 WHERE article = 'JNS-BLU-32';
-
-
--- ============================================
--- 1. DRAFT -> ON SALE
--- ============================================
 
 UPDATE sku
 SET status = 'on_sale'
@@ -35,11 +18,6 @@ SELECT
     stock_quantity
 FROM sku
 WHERE article = 'JNS-BLU-32';
-
-
--- ============================================
--- 2. ON SALE -> OUT OF STOCK
--- ============================================
 
 UPDATE sku
 SET
@@ -56,11 +34,6 @@ SELECT
 FROM sku
 WHERE article = 'JNS-BLU-32';
 
-
--- ============================================
--- 3. OUT OF STOCK -> ON SALE
--- ============================================
-
 UPDATE sku
 SET
     stock_quantity = 10,
@@ -75,11 +48,6 @@ SELECT
     stock_quantity
 FROM sku
 WHERE article = 'JNS-BLU-32';
-
-
--- ============================================
--- 4. ON SALE -> ARCHIVED
--- ============================================
 
 UPDATE sku
 SET status = 'archived'

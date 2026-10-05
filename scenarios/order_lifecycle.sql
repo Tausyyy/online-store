@@ -1,20 +1,3 @@
--- ============================================
--- ORDER LIFECYCLE
---
--- Created
--- -> Awaiting Payment
--- -> Paid
--- -> In Assembly
--- -> Handed to Delivery
--- -> Delivered
--- -> Return Processed
--- ============================================
-
-
--- ============================================
--- 1. CREATE ORDER
--- ============================================
-
 INSERT INTO orders (
     customer_id,
     status,
@@ -39,10 +22,6 @@ VALUES
     CURRENT_TIMESTAMP
 );
 
-
--- ============================================
--- 2. ADD ORDER ITEM
--- ============================================
 
 INSERT INTO order_items (
     order_id,
@@ -75,11 +54,6 @@ VALUES
     )
 );
 
-
--- ============================================
--- 3. CHECK ORDER BEFORE STOCK DECREASE
--- ============================================
-
 SELECT
     o.order_id,
     o.status,
@@ -105,11 +79,6 @@ WHERE o.order_id = (
     ORDER BY o2.order_id DESC
     LIMIT 1
 );
-
-
--- ============================================
--- 4. CHECK STOCK AVAILABILITY
--- ============================================
 
 DO $$
 DECLARE
@@ -152,11 +121,6 @@ BEGIN
     END IF;
 END $$;
 
-
--- ============================================
--- 5. DECREASE STOCK
--- ============================================
-
 UPDATE sku s
 SET stock_quantity = s.stock_quantity - oi.quantity
 FROM order_items oi
@@ -172,18 +136,11 @@ WHERE oi.sku_id = s.sku_id
       LIMIT 1
   );
 
-
--- Проверяем остаток
 SELECT
     article,
     stock_quantity
 FROM sku
 WHERE article = 'TSH-WHT-L';
-
-
--- ============================================
--- 6. CREATED -> AWAITING PAYMENT
--- ============================================
 
 UPDATE orders
 SET status = 'awaiting_payment'
@@ -198,11 +155,6 @@ WHERE order_id = (
 )
 AND status = 'created';
 
-
--- ============================================
--- 7. AWAITING PAYMENT -> PAID
--- ============================================
-
 UPDATE orders
 SET status = 'paid'
 WHERE order_id = (
@@ -215,11 +167,6 @@ WHERE order_id = (
     LIMIT 1
 )
 AND status = 'awaiting_payment';
-
-
--- ============================================
--- 8. PAID -> IN ASSEMBLY
--- ============================================
 
 UPDATE orders
 SET status = 'in_assembly'
@@ -234,11 +181,6 @@ WHERE order_id = (
 )
 AND status = 'paid';
 
-
--- ============================================
--- 9. IN ASSEMBLY -> HANDED TO DELIVERY
--- ============================================
-
 UPDATE orders
 SET status = 'handed_to_delivery'
 WHERE order_id = (
@@ -251,11 +193,6 @@ WHERE order_id = (
     LIMIT 1
 )
 AND status = 'in_assembly';
-
-
--- ============================================
--- 10. HANDED TO DELIVERY -> DELIVERED
--- ============================================
 
 UPDATE orders
 SET status = 'delivered'
@@ -270,11 +207,6 @@ WHERE order_id = (
 )
 AND status = 'handed_to_delivery';
 
-
--- ============================================
--- 11. DELIVERED -> RETURN PROCESSED
--- ============================================
-
 UPDATE orders
 SET status = 'return_processed'
 WHERE order_id = (
@@ -287,11 +219,6 @@ WHERE order_id = (
     LIMIT 1
 )
 AND status = 'delivered';
-
-
--- ============================================
--- FINAL RESULT
--- ============================================
 
 SELECT
     o.order_id,

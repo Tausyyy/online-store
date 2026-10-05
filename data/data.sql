@@ -1,17 +1,8 @@
--- ============================================
--- CATEGORIES
--- ============================================
-
 INSERT INTO categories (name, description)
 VALUES
     ('Футболки', 'Повседневные футболки'),
     ('Худи', 'Толстовки с капюшоном'),
     ('Джинсы', 'Мужские и женские джинсы');
-
-
--- ============================================
--- CUSTOMERS
--- ============================================
 
 INSERT INTO customers (
     email,
@@ -22,11 +13,6 @@ INSERT INTO customers (
 VALUES
     ('ivan@example.com', 'hash_ivan', '+79990000001', 'customer'),
     ('anna@example.com', 'hash_anna', '+79990000002', 'customer');
-
-
--- ============================================
--- PRODUCTS
--- ============================================
 
 INSERT INTO products (
     category_id,
@@ -70,10 +56,6 @@ VALUES
     'published'
 );
 
-
--- ============================================
--- SKU
--- ============================================
 
 INSERT INTO sku (
     product_id,
@@ -138,11 +120,6 @@ VALUES
     'draft'
 );
 
-
--- ============================================
--- ACTIVE CART FOR IVAN
--- ============================================
-
 INSERT INTO carts (
     customer_id,
     status,
@@ -161,10 +138,6 @@ VALUES
     CURRENT_TIMESTAMP + INTERVAL '7 days'
 );
 
-
--- ============================================
--- CART ITEMS
--- ============================================
 
 INSERT INTO cart_items (
     cart_id,
@@ -209,11 +182,6 @@ VALUES
     1
 );
 
-
--- ============================================
--- INITIAL ORDER FOR ANNA
--- ============================================
-
 INSERT INTO orders (
     customer_id,
     status,
@@ -237,11 +205,6 @@ VALUES
     'card',
     CURRENT_TIMESTAMP
 );
-
-
--- ============================================
--- ORDER ITEM
--- ============================================
 
 INSERT INTO order_items (
     order_id,

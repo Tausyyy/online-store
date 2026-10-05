@@ -1,15 +1,3 @@
--- ============================================
--- CART LIFECYCLE
---
--- Active -> Completed
--- Active -> Expired
--- ============================================
-
-
--- ============================================
--- 1. CHECK INITIAL ACTIVE CART
--- ============================================
-
 SELECT
     c.cart_id,
     c.status,
@@ -31,10 +19,6 @@ ORDER BY c.cart_id DESC
 LIMIT 1;
 
 
--- ============================================
--- 2. ACTIVE -> COMPLETED
--- ============================================
-
 UPDATE carts
 SET status = 'completed'
 WHERE cart_id = (
@@ -50,7 +34,6 @@ WHERE cart_id = (
 AND status = 'active';
 
 
--- Проверяем результат
 SELECT
     c.cart_id,
     c.customer_id,
@@ -64,10 +47,6 @@ WHERE cu.email = 'ivan@example.com'
 ORDER BY c.cart_id DESC
 LIMIT 1;
 
-
--- ============================================
--- 3. CREATE EXPIRED CART
--- ============================================
 
 INSERT INTO carts (
     customer_id,
@@ -88,10 +67,6 @@ VALUES
 );
 
 
--- ============================================
--- 4. ACTIVE -> EXPIRED
--- ============================================
-
 UPDATE carts
 SET status = 'expired'
 WHERE cart_id = (
@@ -108,7 +83,6 @@ WHERE cart_id = (
 AND status = 'active';
 
 
--- Проверяем результат
 SELECT
     c.cart_id,
     c.customer_id,
