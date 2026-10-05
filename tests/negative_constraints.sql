@@ -1,7 +1,3 @@
--- Негативные тесты ограничений целостности.
-
--- Минимальные валидные данные для независимого запуска тестов.
--- Если data.sql уже загружен, имена всё равно уникальны.
 INSERT INTO categories(name, description)
 VALUES ('Constraint Test Category', 'fixture')
 ON CONFLICT (name) DO NOTHING;
@@ -48,8 +44,6 @@ WHERE c.email = 'constraint-test@example.com'
       WHERE o.customer_id = c.customer_id AND o.customer_name = 'Constraint Test User'
   );
 
--- Требование: миграция 001 уже применена, data.sql загружен.
--- Каждый тест ожидает конкретный SQLSTATE PostgreSQL.
 
 CREATE OR REPLACE FUNCTION pg_temp.assert_constraint_violation(
     p_test_name text,

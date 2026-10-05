@@ -1,5 +1,5 @@
 -- Проверка совместимости UP с данными, допустимыми исходной схемой.
--- Запускать ПОСЛЕ create_tables.sql.sql и ДО 001_add_constraints.up.sql.
+
 INSERT INTO categories(name, description)
 VALUES ('Legacy category', 'Allowed by old schema');
 

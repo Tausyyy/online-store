@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Автоматическая проверка миграции 001.
-# Требуется: PostgreSQL, psql, createdb, dropdb.
-# DATABASE_URL должен указывать на существующую БД, например:
-# export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/clothing_store"
-#
 # Скрипт создаёт временную БД, поэтому исходная БД не изменяется.
 
 : "${DATABASE_URL:?Ошибка: задайте DATABASE_URL}"
