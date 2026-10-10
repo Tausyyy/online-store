@@ -50,7 +50,9 @@ FROM sku
 WHERE article = 'JNS-BLU-32';
 
 UPDATE sku
-SET status = 'archived'
+SET
+    status = 'archived',
+    stock_quantity = 0
 WHERE article = 'JNS-BLU-32'
   AND status = 'on_sale';
 

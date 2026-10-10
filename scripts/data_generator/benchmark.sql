@@ -1,5 +1,5 @@
 \set ON_ERROR_STOP on
-
+\timing off
 
 BEGIN;
 
@@ -26,10 +26,10 @@ $$;
 
 
 CREATE TEMP TABLE benchmark_source (
-    id BIGINT PRIMARY KEY,
+    id            BIGINT PRIMARY KEY,
     customer_code TEXT NOT NULL,
-    amount NUMERIC(10, 2) NOT NULL,
-    created_at TIMESTAMP NOT NULL
+    amount        NUMERIC(10, 2) NOT NULL,
+    created_at    TIMESTAMP NOT NULL
 ) ON COMMIT DROP;
 
 
@@ -51,213 +51,251 @@ FROM generate_series(
 ) AS gs(n);
 
 
-CREATE TEMP TABLE benchmark_bulk (
-    id BIGINT,
-    customer_code TEXT,
-    amount NUMERIC(10, 2),
-    created_at TIMESTAMP
+CREATE TEMP TABLE benchmark_insert_target (
+    id            BIGINT PRIMARY KEY,
+    customer_code TEXT NOT NULL,
+    amount        NUMERIC(10, 2) NOT NULL,
+    created_at    TIMESTAMP NOT NULL
 ) ON COMMIT DROP;
 
 
-CREATE TEMP TABLE benchmark_row (
-    id BIGINT,
-    customer_code TEXT,
-    amount NUMERIC(10, 2),
-    created_at TIMESTAMP
+CREATE TEMP TABLE benchmark_copy_target (
+    id            BIGINT PRIMARY KEY,
+    customer_code TEXT NOT NULL,
+    amount        NUMERIC(10, 2) NOT NULL,
+    created_at    TIMESTAMP NOT NULL
 ) ON COMMIT DROP;
 
 
-CREATE TEMP TABLE benchmark_results (
-    method TEXT NOT NULL,
-    repetition INTEGER NOT NULL,
-    inserted_rows BIGINT NOT NULL,
-    elapsed_ms NUMERIC(14, 3) NOT NULL
-) ON COMMIT DROP;
+\copy benchmark_source (id, customer_code, amount, created_at) TO '/tmp/online_store_copy_benchmark.csv' WITH (FORMAT csv, HEADER true)
 
 
-DO $$
-DECLARE
-    v_rep INTEGER;
-    v_started TIMESTAMP;
-    v_finished TIMESTAMP;
-    v_count BIGINT;
-BEGIN
-    FOR v_rep IN 1..3 LOOP
+\echo
+\echo '===== INSERT ... SELECT: 5 замеров ====='
 
-        TRUNCATE TABLE benchmark_bulk;
+TRUNCATE TABLE benchmark_insert_target;
 
-        v_started := clock_timestamp();
+\timing on
 
-        INSERT INTO benchmark_bulk (
-            id,
-            customer_code,
-            amount,
-            created_at
-        )
-        SELECT
-            id,
-            customer_code,
-            amount,
-            created_at
-        FROM benchmark_source;
-
-        v_finished := clock_timestamp();
-
-        SELECT COUNT(*)
-        INTO v_count
-        FROM benchmark_bulk;
-
-        INSERT INTO benchmark_results (
-            method,
-            repetition,
-            inserted_rows,
-            elapsed_ms
-        )
-        VALUES (
-            'INSERT_SELECT',
-            v_rep,
-            v_count,
-            EXTRACT(
-                EPOCH FROM (v_finished - v_started)
-            ) * 1000
-        );
-
-    END LOOP;
-END;
-$$;
-
-
-DO $$
-DECLARE
-    v_rep INTEGER;
-    v_started TIMESTAMP;
-    v_finished TIMESTAMP;
-    v_count BIGINT;
-    v_row RECORD;
-BEGIN
-    FOR v_rep IN 1..3 LOOP
-
-        TRUNCATE TABLE benchmark_row;
-
-        v_started := clock_timestamp();
-
-        FOR v_row IN
-            SELECT
-                id,
-                customer_code,
-                amount,
-                created_at
-            FROM benchmark_source
-            ORDER BY id
-        LOOP
-            INSERT INTO benchmark_row (
-                id,
-                customer_code,
-                amount,
-                created_at
-            )
-            VALUES (
-                v_row.id,
-                v_row.customer_code,
-                v_row.amount,
-                v_row.created_at
-            );
-        END LOOP;
-
-        v_finished := clock_timestamp();
-
-        SELECT COUNT(*)
-        INTO v_count
-        FROM benchmark_row;
-
-        INSERT INTO benchmark_results (
-            method,
-            repetition,
-            inserted_rows,
-            elapsed_ms
-        )
-        VALUES (
-            'ROW_BY_ROW',
-            v_rep,
-            v_count,
-            EXTRACT(
-                EPOCH FROM (v_finished - v_started)
-            ) * 1000
-        );
-
-    END LOOP;
-END;
-$$;
-
-
-SELECT
-    method,
-    repetition,
-    inserted_rows,
-    elapsed_ms
-FROM benchmark_results
-ORDER BY method, repetition;
-
-
-SELECT
-    method,
-    MAX(inserted_rows) AS inserted_rows,
-    ROUND(
-        percentile_cont(0.5)
-        WITHIN GROUP (ORDER BY elapsed_ms)::NUMERIC,
-        3
-    ) AS median_ms
-FROM benchmark_results
-GROUP BY method
-ORDER BY median_ms;
-
-
-WITH medians AS (
-    SELECT
-        method,
-        percentile_cont(0.5)
-            WITHIN GROUP (ORDER BY elapsed_ms) AS median_ms
-    FROM benchmark_results
-    GROUP BY method
+INSERT INTO benchmark_insert_target (
+    id,
+    customer_code,
+    amount,
+    created_at
 )
 SELECT
-    MAX(
-        CASE
-            WHEN method = 'INSERT_SELECT'
-            THEN median_ms
-        END
-    ) AS insert_select_median_ms,
+    id,
+    customer_code,
+    amount,
+    created_at
+FROM benchmark_source;
 
-    MAX(
-        CASE
-            WHEN method = 'ROW_BY_ROW'
-            THEN median_ms
-        END
-    ) AS row_by_row_median_ms,
+\timing off
 
-    ROUND(
-        (
-            MAX(
-                CASE
-                    WHEN method = 'ROW_BY_ROW'
-                    THEN median_ms
-                END
-            )
-            /
-            NULLIF(
-                MAX(
-                    CASE
-                        WHEN method = 'INSERT_SELECT'
-                        THEN median_ms
-                    END
-                ),
-                0
-            )
-        )::NUMERIC,
-        2
-    ) AS row_by_row_is_slower_times
 
-FROM medians;
+TRUNCATE TABLE benchmark_insert_target;
+
+\timing on
+
+INSERT INTO benchmark_insert_target (
+    id,
+    customer_code,
+    amount,
+    created_at
+)
+SELECT
+    id,
+    customer_code,
+    amount,
+    created_at
+FROM benchmark_source;
+
+\timing off
+
+
+TRUNCATE TABLE benchmark_insert_target;
+
+\timing on
+
+INSERT INTO benchmark_insert_target (
+    id,
+    customer_code,
+    amount,
+    created_at
+)
+SELECT
+    id,
+    customer_code,
+    amount,
+    created_at
+FROM benchmark_source;
+
+\timing off
+
+
+TRUNCATE TABLE benchmark_insert_target;
+
+\timing on
+
+INSERT INTO benchmark_insert_target (
+    id,
+    customer_code,
+    amount,
+    created_at
+)
+SELECT
+    id,
+    customer_code,
+    amount,
+    created_at
+FROM benchmark_source;
+
+\timing off
+
+
+TRUNCATE TABLE benchmark_insert_target;
+
+\timing on
+
+INSERT INTO benchmark_insert_target (
+    id,
+    customer_code,
+    amount,
+    created_at
+)
+SELECT
+    id,
+    customer_code,
+    amount,
+    created_at
+FROM benchmark_source;
+
+\timing off
+
+
+\echo
+\echo '===== COPY: 5 замеров ====='
+
+TRUNCATE TABLE benchmark_copy_target;
+
+\timing on
+
+\copy benchmark_copy_target (id, customer_code, amount, created_at) FROM '/tmp/online_store_copy_benchmark.csv' WITH (FORMAT csv, HEADER true)
+
+\timing off
+
+
+TRUNCATE TABLE benchmark_copy_target;
+
+\timing on
+
+\copy benchmark_copy_target (id, customer_code, amount, created_at) FROM '/tmp/online_store_copy_benchmark.csv' WITH (FORMAT csv, HEADER true)
+
+\timing off
+
+
+TRUNCATE TABLE benchmark_copy_target;
+
+\timing on
+
+\copy benchmark_copy_target (id, customer_code, amount, created_at) FROM '/tmp/online_store_copy_benchmark.csv' WITH (FORMAT csv, HEADER true)
+
+\timing off
+
+
+TRUNCATE TABLE benchmark_copy_target;
+
+\timing on
+
+\copy benchmark_copy_target (id, customer_code, amount, created_at) FROM '/tmp/online_store_copy_benchmark.csv' WITH (FORMAT csv, HEADER true)
+
+\timing off
+
+
+TRUNCATE TABLE benchmark_copy_target;
+
+\timing on
+
+\copy benchmark_copy_target (id, customer_code, amount, created_at) FROM '/tmp/online_store_copy_benchmark.csv' WITH (FORMAT csv, HEADER true)
+
+\timing off
+
+
+DO $$
+DECLARE
+    v_expected BIGINT :=
+        current_setting('app.benchmark_rows')::BIGINT;
+
+    v_source BIGINT;
+    v_insert BIGINT;
+    v_copy BIGINT;
+BEGIN
+    SELECT COUNT(*) INTO v_source
+    FROM benchmark_source;
+
+    SELECT COUNT(*) INTO v_insert
+    FROM benchmark_insert_target;
+
+    SELECT COUNT(*) INTO v_copy
+    FROM benchmark_copy_target;
+
+    IF v_source <> v_expected
+       OR v_insert <> v_expected
+       OR v_copy <> v_expected THEN
+        RAISE EXCEPTION
+            'Количество строк не совпадает: source=%, INSERT=%, COPY=%, expected=%',
+            v_source, v_insert, v_copy, v_expected;
+    END IF;
+
+    IF EXISTS (
+        SELECT id, customer_code, amount, created_at
+        FROM benchmark_source
+
+        EXCEPT
+
+        SELECT id, customer_code, amount, created_at
+        FROM benchmark_insert_target
+    ) THEN
+        RAISE EXCEPTION 'Данные INSERT отличаются от источника';
+    END IF;
+
+    IF EXISTS (
+        SELECT id, customer_code, amount, created_at
+        FROM benchmark_source
+
+        EXCEPT
+
+        SELECT id, customer_code, amount, created_at
+        FROM benchmark_copy_target
+    ) THEN
+        RAISE EXCEPTION 'Данные COPY отличаются от источника';
+    END IF;
+
+    RAISE NOTICE
+        'Проверка пройдена: source=%, INSERT=%, COPY=%',
+        v_source, v_insert, v_copy;
+END;
+$$;
+
+
+SELECT
+    'source' AS dataset,
+    COUNT(*) AS row_count
+FROM benchmark_source
+
+UNION ALL
+
+SELECT
+    'INSERT ... SELECT',
+    COUNT(*)
+FROM benchmark_insert_target
+
+UNION ALL
+
+SELECT
+    'COPY',
+    COUNT(*)
+FROM benchmark_copy_target;
 
 
 COMMIT;
