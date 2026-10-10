@@ -1,0 +1,41 @@
+Nested Loop  (cost=6789.24..48502.31 rows=1700 width=89) (actual time=50.159..170.685 rows=1961.00 loops=1)
+  Buffers: shared hit=26532 read=14481 written=335
+  ->  Gather  (cost=6788.96..47971.21 rows=1700 width=80) (actual time=50.084..166.204 rows=1961.00 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        Buffers: shared hit=20700 read=14430 written=284
+        ->  Nested Loop  (cost=5788.96..46801.21 rows=708 width=80) (actual time=25.926..142.963 rows=653.67 loops=3)
+              Buffers: shared hit=20700 read=14430 written=284
+              ->  Nested Loop  (cost=5788.68..46586.84 rows=708 width=73) (actual time=25.902..141.047 rows=653.67 loops=3)
+                    Buffers: shared hit=14815 read=14430 written=284
+                    ->  Parallel Hash Join  (cost=5788.39..46569.68 rows=708 width=41) (actual time=25.763..140.697 rows=653.67 loops=3)
+                          Hash Cond: (oi.order_id = o.order_id)
+                          Buffers: shared hit=14798 read=14427 written=281
+                          ->  Parallel Seq Scan on order_items oi  (cost=0.00..37500.00 rows=1250000 width=25) (actual time=0.173..48.985 rows=1000000.00 loops=3)
+                                Buffers: shared hit=12415 read=12585 written=281
+                          ->  Parallel Hash  (cost=5787.50..5787.50 rows=71 width=24) (actual time=9.129..9.129 rows=68.00 loops=3)
+                                Buckets: 1024  Batches: 1  Memory Usage: 104kB
+                                Buffers: shared hit=2383 read=1842
+                                ->  Parallel Seq Scan on orders o  (cost=0.00..5787.50 rows=71 width=24) (actual time=0.222..8.997 rows=68.00 loops=3)
+                                      Filter: (customer_id = 15)
+                                      Rows Removed by Filter: 99932
+                                      Buffers: shared hit=2383 read=1842
+                    ->  Materialize  (cost=0.29..8.31 rows=1 width=40) (actual time=0.000..0.000 rows=1.00 loops=1961)
+                          Storage: Memory  Maximum Storage: 17kB
+                          Buffers: shared hit=17 read=3 written=3
+                          ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=40) (actual time=0.127..0.128 rows=1.00 loops=3)
+                                Index Cond: (customer_id = 15)
+                                Index Searches: 3
+                                Buffers: shared hit=17 read=3 written=3
+              ->  Index Scan using sku_pkey on sku s  (cost=0.29..0.30 rows=1 width=23) (actual time=0.003..0.003 rows=1.00 loops=1961)
+                    Index Cond: (sku_id = oi.sku_id)
+                    Index Searches: 1961
+                    Buffers: shared hit=5885
+  ->  Index Scan using products_pkey on products p  (cost=0.28..0.31 rows=1 width=25) (actual time=0.002..0.002 rows=1.00 loops=1961)
+        Index Cond: (product_id = s.product_id)
+        Index Searches: 1961
+        Buffers: shared hit=5832 read=51 written=51
+Planning:
+  Buffers: shared hit=353 read=7
+Planning Time: 1.716 ms
+Execution Time: 170.926 ms
