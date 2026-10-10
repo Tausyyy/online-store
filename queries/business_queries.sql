@@ -23,7 +23,7 @@ FROM products p
 JOIN sku s ON p.product_id = s.product_id
 JOIN order_items oi ON s.sku_id = oi.sku_id
 JOIN orders o ON oi.order_id = o.order_id
-WHERE o.status = 'completed'
+WHERE o.status = 'delivered'
 GROUP BY p.product_id, p.name
 ORDER BY total_sold DESC
 LIMIT 10;
@@ -36,7 +36,7 @@ JOIN products p ON c.category_id = p.category_id
 JOIN sku s ON p.product_id = s.product_id
 JOIN order_items oi ON s.sku_id = oi.sku_id
 JOIN orders o ON oi.order_id = o.order_id
-WHERE o.status = 'completed'
+WHERE o.status = 'delivered'
 GROUP BY c.name
 ORDER BY revenue DESC;
 

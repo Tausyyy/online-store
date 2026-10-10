@@ -1,0 +1,6 @@
+psql:/project/scenarios/transaction_rollback.sql:99: NOTICE:  Внутри транзакции создан заказ 10003, остаток временно уменьшен
+ orders_before | orders_after | items_before | items_after | tshirt_stock_before | tshirt_stock_after | hoodie_stock_before | hoodie_stock_after 
+---------------+--------------+--------------+-------------+---------------------+--------------------+---------------------+--------------------
+         10002 |        10002 |       100003 |      100003 |                  18 |                 18 |                   9 |                  9
+(1 row)
+

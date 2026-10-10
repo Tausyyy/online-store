@@ -1,0 +1,154 @@
+[1/8] Создание чистой БД: online_store_constraints_ci
+[2/8] Исходная схема
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+[3/8] Тест данных, допустимых исходной схемой
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+[4/8] UP: 001_add_constraints
+BEGIN
+CREATE TABLE
+DO
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+UPDATE 1
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+INSERT 0 1
+COMMIT
+[5/8] Проверка структуры и ограничений
+BEGIN
+DO
+ROLLBACK
+[6/8] Негативные тесты
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+CREATE FUNCTION
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:80: NOTICE:  PASS: categories.name NOT NULL (SQLSTATE 23502)
+psql:/project/tests/negative_constraints.sql:88: NOTICE:  PASS: customers.email UNIQUE (SQLSTATE 23505)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:97: NOTICE:  PASS: sku.article UNIQUE (SQLSTATE 23505)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:106: NOTICE:  PASS: sku.price >= 0 (SQLSTATE 23514)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:115: NOTICE:  PASS: sku.stock_quantity >= 0 (SQLSTATE 23514)
+psql:/project/tests/negative_constraints.sql:124: NOTICE:  PASS: cart_items.quantity > 0 (SQLSTATE 23514)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:133: NOTICE:  PASS: order_items.quantity > 0 (SQLSTATE 23514)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:142: NOTICE:  PASS: order_items.fixed_price >= 0 (SQLSTATE 23514)
+psql:/project/tests/negative_constraints.sql:150: NOTICE:  PASS: products.category_id FOREIGN KEY (SQLSTATE 23503)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:158: NOTICE:  PASS: sku.product_id FOREIGN KEY (SQLSTATE 23503)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+DROP FUNCTION
+[7/8] DOWN + проверка обратимости
+BEGIN
+DO
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+DELETE 1
+COMMIT
+BEGIN
+DO
+ROLLBACK
+[8/8] Повторный UP после DOWN
+BEGIN
+psql:/project/migrations/001_add_constraints.up.sql:7: NOTICE:  relation "schema_migrations" already exists, skipping
+CREATE TABLE
+DO
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+UPDATE 0
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+INSERT 0 1
+COMMIT
+BEGIN
+DO
+ROLLBACK
+PASS: UP -> checks -> negative tests -> DOWN -> checks -> UP

@@ -1,0 +1,23 @@
+# Запуск базы данных одной командой:   docker compose up -d
+# Остановить и УДАЛИТЬ данные:         docker compose down -v
+services:
+  db:
+    image: postgres:18
+    container_name: online_store_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: online_store
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql   
+      - ./:/project                 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d online_store"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  pgdata:
