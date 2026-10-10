@@ -1,4 +1,3 @@
--- Запустить в третьем сеансе, пока операция в другом сеансе ждёт блокировку.
 
 SELECT
     pid, usename, state, wait_event_type, wait_event,
