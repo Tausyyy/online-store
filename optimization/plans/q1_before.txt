@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Gather  (cost=6693.77..48017.49 rows=2300 width=89) (actual time=132.585..279.999 rows=2360.00 loops=1)
   Workers Planned: 2
   Workers Launched: 2
@@ -25,6 +26,35 @@ Gather  (cost=6693.77..48017.49 rows=2300 width=89) (actual time=132.585..279.99
                           Storage: Memory  Maximum Storage: 17kB
                           Buffers: shared hit=17 read=3 written=3
                           ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=40) (actual time=0.103..0.104 rows=1.00 loops=3)
+=======
+Gather  (cost=6694.03..48134.22 rows=2800 width=89) (actual time=23.117..149.887 rows=2360.00 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=19723 read=16529 written=1084
+  ->  Hash Join  (cost=5694.03..46854.22 rows=1167 width=89) (actual time=18.563..141.022 rows=786.67 loops=3)
+        Hash Cond: (s.product_id = p.product_id)
+        Buffers: shared hit=19723 read=16529 written=1084
+        ->  Nested Loop  (cost=5582.53..46739.66 rows=1167 width=80) (actual time=17.808..139.908 rows=786.67 loops=3)
+              Buffers: shared hit=19591 read=16529 written=1084
+              ->  Nested Loop  (cost=5582.25..46386.15 rows=1167 width=73) (actual time=17.768..137.527 rows=786.67 loops=3)
+                    Buffers: shared hit=12509 read=16529 written=1084
+                    ->  Parallel Hash Join  (cost=5581.96..46363.26 rows=1167 width=41) (actual time=17.604..137.061 rows=786.67 loops=3)
+                          Hash Cond: (oi.order_id = o.order_id)
+                          Buffers: shared hit=12492 read=16526 written=1081
+                          ->  Parallel Seq Scan on order_items oi  (cost=0.00..37500.00 rows=1250000 width=25) (actual time=0.193..61.245 rows=1000000.00 loops=3)
+                                Buffers: shared hit=9282 read=15718 written=282
+                          ->  Parallel Hash  (cost=5580.50..5580.50 rows=117 width=24) (actual time=10.226..10.227 rows=78.67 loops=3)
+                                Buckets: 1024  Batches: 1  Memory Usage: 104kB
+                                Buffers: shared hit=3210 read=808 written=799
+                                ->  Parallel Seq Scan on orders o  (cost=0.00..5580.50 rows=117 width=24) (actual time=0.104..10.104 rows=78.67 loops=3)
+                                      Filter: (customer_id = 15)
+                                      Rows Removed by Filter: 99921
+                                      Buffers: shared hit=3210 read=808 written=799
+                    ->  Materialize  (cost=0.29..8.31 rows=1 width=40) (actual time=0.000..0.000 rows=1.00 loops=2360)
+                          Storage: Memory  Maximum Storage: 17kB
+                          Buffers: shared hit=17 read=3 written=3
+                          ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=40) (actual time=0.145..0.146 rows=1.00 loops=3)
+>>>>>>> 06a2f89 (run_all.sh tested and many fixed)
                                 Index Cond: (customer_id = 15)
                                 Index Searches: 3
                                 Buffers: shared hit=17 read=3 written=3
@@ -32,6 +62,7 @@ Gather  (cost=6693.77..48017.49 rows=2300 width=89) (actual time=132.585..279.99
                     Index Cond: (sku_id = oi.sku_id)
                     Index Searches: 2360
                     Buffers: shared hit=7082
+<<<<<<< HEAD
         ->  Hash  (cost=74.00..74.00 rows=3000 width=25) (actual time=0.851..0.851 rows=3000.00 loops=3)
               Buckets: 4096  Batches: 1  Memory Usage: 219kB
               Buffers: shared hit=132
@@ -41,3 +72,14 @@ Planning:
   Buffers: shared hit=357 read=2 written=2
 Planning Time: 1.511 ms
 Execution Time: 280.233 ms
+=======
+        ->  Hash  (cost=74.00..74.00 rows=3000 width=25) (actual time=0.729..0.729 rows=3000.00 loops=3)
+              Buckets: 4096  Batches: 1  Memory Usage: 219kB
+              Buffers: shared hit=132
+              ->  Seq Scan on products p  (cost=0.00..74.00 rows=3000 width=25) (actual time=0.018..0.291 rows=3000.00 loops=3)
+                    Buffers: shared hit=132
+Planning:
+  Buffers: shared hit=356 read=3 written=3
+Planning Time: 1.435 ms
+Execution Time: 150.151 ms
+>>>>>>> 06a2f89 (run_all.sh tested and many fixed)

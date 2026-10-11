@@ -1,11 +1,5 @@
-#!/usr/bin/env bash
-# Большой набор (3 000 000 строк в order_items) и замеры оптимизации до и после.
-# Занимает 10-30 минут. Планы EXPLAIN сохраняются в optimization/plans/.
-# Запуск: bash run_big.sh   (на Windows - в Git Bash)
-
 set -euo pipefail
 
-# Нужно для Git Bash на Windows: иначе пути вида /project/... портятся.
 export MSYS_NO_PATHCONV=1
 
 cd "$(dirname "$0")"

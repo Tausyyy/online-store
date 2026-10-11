@@ -1,4 +1,3 @@
-
 SELECT
     pid, usename, state, wait_event_type, wait_event,
     pg_blocking_pids(pid) AS blocking_pids,

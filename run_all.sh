@@ -1,11 +1,5 @@
-#!/usr/bin/env bash
-# Запускает всё по порядку на чистой базе в Docker.
-# Результаты сохраняются в папку checks/results/.
-# Запуск: bash run_all.sh   (на Windows - в Git Bash)
-
 set -euo pipefail
 
-# Нужно для Git Bash на Windows: иначе пути вида /project/... портятся.
 export MSYS_NO_PATHCONV=1
 
 cd "$(dirname "$0")"

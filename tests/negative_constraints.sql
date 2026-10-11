@@ -72,14 +72,12 @@ BEGIN
     RAISE NOTICE 'PASS: % (SQLSTATE %)', p_test_name, p_expected_state;
 END $$;
 
--- 1. NOT NULL: categories.name
 SELECT pg_temp.assert_constraint_violation(
     'categories.name NOT NULL',
     $$INSERT INTO categories(name) VALUES (NULL)$$,
     '23502'
 );
 
--- 2. UNIQUE: customers.email
 SELECT pg_temp.assert_constraint_violation(
     'customers.email UNIQUE',
     $$INSERT INTO customers(email, password_hash, role)
@@ -87,7 +85,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23505'
 );
 
--- 3. UNIQUE: sku.article
 SELECT pg_temp.assert_constraint_violation(
     'sku.article UNIQUE',
     $$INSERT INTO sku(product_id, article, size, color, price, stock_quantity, status)
@@ -96,7 +93,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23505'
 );
 
--- 4. CHECK: SKU price cannot be negative.
 SELECT pg_temp.assert_constraint_violation(
     'sku.price >= 0',
     $$INSERT INTO sku(product_id, article, size, color, price, stock_quantity, status)
@@ -105,7 +101,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23514'
 );
 
--- 5. CHECK: SKU stock cannot be negative.
 SELECT pg_temp.assert_constraint_violation(
     'sku.stock_quantity >= 0',
     $$INSERT INTO sku(product_id, article, size, color, price, stock_quantity, status)
@@ -114,7 +109,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23514'
 );
 
--- 6. NOT NULL + CHECK: cart item quantity must be positive.
 SELECT pg_temp.assert_constraint_violation(
     'cart_items.quantity > 0',
     $$INSERT INTO cart_items(cart_id, sku_id, quantity)
@@ -123,7 +117,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23514'
 );
 
--- 7. CHECK: order item quantity must be positive.
 SELECT pg_temp.assert_constraint_violation(
     'order_items.quantity > 0',
     $$INSERT INTO order_items(order_id, sku_id, quantity, fixed_price)
@@ -132,7 +125,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23514'
 );
 
--- 8. CHECK: fixed order-item price cannot be negative.
 SELECT pg_temp.assert_constraint_violation(
     'order_items.fixed_price >= 0',
     $$INSERT INTO order_items(order_id, sku_id, quantity, fixed_price)
@@ -141,7 +133,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23514'
 );
 
--- 9. FOREIGN KEY: product must reference an existing category.
 SELECT pg_temp.assert_constraint_violation(
     'products.category_id FOREIGN KEY',
     $$INSERT INTO products(category_id, name, brand, publication_status)
@@ -149,7 +140,6 @@ SELECT pg_temp.assert_constraint_violation(
     '23503'
 );
 
--- 10. FOREIGN KEY: SKU must reference an existing product.
 SELECT pg_temp.assert_constraint_violation(
     'sku.product_id FOREIGN KEY',
     $$INSERT INTO sku(product_id, article, size, color, price, stock_quantity, status)

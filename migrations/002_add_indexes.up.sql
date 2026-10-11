@@ -10,10 +10,8 @@ BEGIN
     END IF;
 END $$;
 
--- Нужен запросам "заказы покупателя" (WHERE customer_id = ...).
 CREATE INDEX idx_orders_customer_id ON orders (customer_id);
 
--- Нужен для перехода от заказа к его позициям (JOIN order_items ON order_id).
 CREATE INDEX idx_order_items_order_id ON order_items (order_id);
 
 INSERT INTO schema_migrations (version, description)

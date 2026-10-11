@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Скрипт создаёт временную БД, поэтому исходная БД не изменяется.
-
 : "${DATABASE_URL:?Ошибка: задайте DATABASE_URL}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

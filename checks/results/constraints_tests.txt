@@ -47,12 +47,12 @@ INSERT 0 1
 INSERT 0 1
 INSERT 0 1
 CREATE FUNCTION
+psql:/project/tests/negative_constraints.sql:80: NOTICE:  PASS: categories.name NOT NULL (SQLSTATE 23502)
  assert_constraint_violation 
 -----------------------------
  
 (1 row)
 
-psql:/project/tests/negative_constraints.sql:80: NOTICE:  PASS: categories.name NOT NULL (SQLSTATE 23502)
 psql:/project/tests/negative_constraints.sql:88: NOTICE:  PASS: customers.email UNIQUE (SQLSTATE 23505)
  assert_constraint_violation 
 -----------------------------
@@ -71,12 +71,12 @@ psql:/project/tests/negative_constraints.sql:97: NOTICE:  PASS: sku.article UNIQ
 (1 row)
 
 psql:/project/tests/negative_constraints.sql:106: NOTICE:  PASS: sku.price >= 0 (SQLSTATE 23514)
+psql:/project/tests/negative_constraints.sql:115: NOTICE:  PASS: sku.stock_quantity >= 0 (SQLSTATE 23514)
  assert_constraint_violation 
 -----------------------------
  
 (1 row)
 
-psql:/project/tests/negative_constraints.sql:115: NOTICE:  PASS: sku.stock_quantity >= 0 (SQLSTATE 23514)
 psql:/project/tests/negative_constraints.sql:124: NOTICE:  PASS: cart_items.quantity > 0 (SQLSTATE 23514)
  assert_constraint_violation 
 -----------------------------
@@ -126,8 +126,8 @@ DO
 ROLLBACK
 [8/8] Повторный UP после DOWN
 BEGIN
-psql:/project/migrations/001_add_constraints.up.sql:7: NOTICE:  relation "schema_migrations" already exists, skipping
 CREATE TABLE
+psql:/project/migrations/001_add_constraints.up.sql:7: NOTICE:  relation "schema_migrations" already exists, skipping
 DO
 ALTER TABLE
 ALTER TABLE

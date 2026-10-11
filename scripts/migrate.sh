@@ -1,4 +1,3 @@
-
 set -euo pipefail
 
 MIGRATIONS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../migrations" && pwd)"
