@@ -11,7 +11,7 @@ DECLARE
     v_item RECORD;
     v_item_count INTEGER := 0;
 BEGIN
-    -- Находим и блокируем активную корзину Ивана.
+    
     SELECT c.cart_id, c.customer_id, cu.phone
     INTO v_cart_id, v_customer_id, v_customer_phone
     FROM carts c
@@ -26,7 +26,7 @@ BEGIN
         RAISE EXCEPTION 'Активная корзина Ивана не найдена';
     END IF;
 
-    -- Блокируем SKU и проверяем возможность покупки.
+
     FOR v_item IN
         SELECT
             ci.sku_id,
@@ -61,7 +61,6 @@ BEGIN
         RAISE EXCEPTION 'Корзина пуста';
     END IF;
 
-    -- Создаём заказ в статусе created.
     INSERT INTO orders (
         customer_id,
         status,
@@ -82,7 +81,6 @@ BEGIN
     )
     RETURNING order_id INTO v_order_id;
 
-    -- Копируем товары из корзины в заказ по текущей цене.
     INSERT INTO order_items (
         order_id,
         sku_id,
@@ -98,14 +96,12 @@ BEGIN
     JOIN sku s ON s.sku_id = ci.sku_id
     WHERE ci.cart_id = v_cart_id;
 
-    -- Списываем количество товаров из остатков.
     UPDATE sku s
     SET stock_quantity = s.stock_quantity - ci.quantity
     FROM cart_items ci
     WHERE ci.cart_id = v_cart_id
       AND ci.sku_id = s.sku_id;
 
-    -- Отмечаем корзину как оформленную.
     UPDATE carts
     SET status = 'completed'
     WHERE cart_id = v_cart_id
@@ -117,7 +113,6 @@ END $$;
 
 COMMIT;
 
--- Проверяем заказ и его позиции.
 SELECT
     o.order_id,
     o.status,
@@ -133,7 +128,6 @@ WHERE c.email = 'ivan@example.com'
 ORDER BY o.order_id DESC, s.article
 LIMIT 20;
 
--- Проверяем остатки и статус корзины.
 SELECT article, status, stock_quantity
 FROM sku
 WHERE article IN ('TSH-BLK-M', 'HOD-GRY-M')
