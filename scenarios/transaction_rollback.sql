@@ -109,4 +109,3 @@ SELECT
     :tshirt_stock_after AS tshirt_stock_after,
     :hoodie_stock_before AS hoodie_stock_before,
     :hoodie_stock_after AS hoodie_stock_after;
-SQL
