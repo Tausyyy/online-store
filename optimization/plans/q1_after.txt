@@ -1,83 +1,40 @@
-<<<<<<< HEAD
-Hash Join  (cost=3096.01..3581.59 rows=2500 width=89) (actual time=9.288..12.168 rows=2360.00 loops=1)
+Hash Join  (cost=3319.79..3807.88 rows=2700 width=89) (actual time=9.372..13.581 rows=2360.00 loops=1)
   Hash Cond: (s.product_id = p.product_id)
-  Buffers: shared hit=1081 read=376 written=21
-  ->  Hash Join  (cost=2984.51..3463.51 rows=2500 width=80) (actual time=8.377..10.886 rows=2360.00 loops=1)
+  Buffers: shared hit=1083 read=374
+  ->  Hash Join  (cost=3208.29..3689.29 rows=2700 width=80) (actual time=8.161..11.732 rows=2360.00 loops=1)
         Hash Cond: (s.sku_id = oi.sku_id)
-        Buffers: shared hit=1037 read=376 written=21
-        ->  Seq Scan on sku s  (cost=0.00..379.00 rows=15000 width=23) (actual time=0.015..0.971 rows=15000.00 loops=1)
+        Buffers: shared hit=1039 read=374
+        ->  Seq Scan on sku s  (cost=0.00..379.00 rows=15000 width=23) (actual time=0.017..1.267 rows=15000.00 loops=1)
               Buffers: shared hit=229
-        ->  Hash  (cost=2953.26..2953.26 rows=2500 width=73) (actual time=8.226..8.228 rows=2360.00 loops=1)
+        ->  Hash  (cost=3174.54..3174.54 rows=2700 width=73) (actual time=7.908..7.923 rows=2360.00 loops=1)
               Buckets: 4096  Batches: 1  Memory Usage: 291kB
-              Buffers: shared hit=808 read=376 written=21
-              ->  Nested Loop  (cost=7.08..2953.26 rows=2500 width=73) (actual time=0.329..7.667 rows=2360.00 loops=1)
-                    Buffers: shared hit=808 read=376 written=21
-                    ->  Nested Loop  (cost=6.65..813.01 rows=250 width=56) (actual time=0.275..1.164 rows=236.00 loops=1)
+              Buffers: shared hit=810 read=374
+              ->  Nested Loop  (cost=7.23..3174.54 rows=2700 width=73) (actual time=0.336..6.980 rows=2360.00 loops=1)
+                    Buffers: shared hit=810 read=374
+                    ->  Nested Loop  (cost=6.80..868.19 rows=270 width=56) (actual time=0.220..1.725 rows=236.00 loops=1)
                           Buffers: shared hit=234 read=6
-                          ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=40) (actual time=0.106..0.107 rows=1.00 loops=1)
+                          ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=40) (actual time=0.114..0.115 rows=1.00 loops=1)
                                 Index Cond: (customer_id = 15)
                                 Index Searches: 1
                                 Buffers: shared hit=3 read=3
-                          ->  Bitmap Heap Scan on orders o  (cost=6.36..802.21 rows=250 width=24) (actual time=0.165..1.010 rows=236.00 loops=1)
+                          ->  Bitmap Heap Scan on orders o  (cost=6.52..857.18 rows=270 width=24) (actual time=0.101..1.551 rows=236.00 loops=1)
                                 Recheck Cond: (customer_id = 15)
                                 Heap Blocks: exact=231
                                 Buffers: shared hit=231 read=3
-                                ->  Bitmap Index Scan on idx_orders_customer_id  (cost=0.00..6.30 rows=250 width=0) (actual time=0.081..0.081 rows=236.00 loops=1)
+                                ->  Bitmap Index Scan on idx_orders_customer_id  (cost=0.00..6.45 rows=270 width=0) (actual time=0.061..0.061 rows=236.00 loops=1)
                                       Index Cond: (customer_id = 15)
                                       Index Searches: 1
                                       Buffers: shared read=3
-                    ->  Index Scan using idx_order_items_order_id on order_items oi  (cost=0.43..8.46 rows=10 width=25) (actual time=0.025..0.026 rows=10.00 loops=236)
+                    ->  Index Scan using idx_order_items_order_id on order_items oi  (cost=0.43..8.44 rows=10 width=25) (actual time=0.019..0.020 rows=10.00 loops=236)
                           Index Cond: (order_id = o.order_id)
                           Index Searches: 236
-                          Buffers: shared hit=574 read=370 written=21
-  ->  Hash  (cost=74.00..74.00 rows=3000 width=25) (actual time=0.890..0.891 rows=3000.00 loops=1)
+                          Buffers: shared hit=576 read=368
+  ->  Hash  (cost=74.00..74.00 rows=3000 width=25) (actual time=1.162..1.163 rows=3000.00 loops=1)
         Buckets: 4096  Batches: 1  Memory Usage: 219kB
         Buffers: shared hit=44
-        ->  Seq Scan on products p  (cost=0.00..74.00 rows=3000 width=25) (actual time=0.026..0.413 rows=3000.00 loops=1)
+        ->  Seq Scan on products p  (cost=0.00..74.00 rows=3000 width=25) (actual time=0.020..0.504 rows=3000.00 loops=1)
               Buffers: shared hit=44
 Planning:
-  Buffers: shared hit=388 read=10
-Planning Time: 2.185 ms
-Execution Time: 12.439 ms
-=======
-Hash Join  (cost=2411.62..2908.37 rows=1900 width=89) (actual time=5.585..8.447 rows=2360.00 loops=1)
-  Hash Cond: (s.product_id = p.product_id)
-  Buffers: shared hit=1088 read=369
-  ->  Hash Join  (cost=2300.12..2791.87 rows=1900 width=80) (actual time=4.918..7.343 rows=2360.00 loops=1)
-        Hash Cond: (s.sku_id = oi.sku_id)
-        Buffers: shared hit=1044 read=369
-        ->  Seq Scan on sku s  (cost=0.00..379.00 rows=15000 width=23) (actual time=0.005..1.024 rows=15000.00 loops=1)
-              Buffers: shared hit=229
-        ->  Hash  (cost=2276.37..2276.37 rows=1900 width=73) (actual time=4.812..4.815 rows=2360.00 loops=1)
-              Buckets: 4096 (originally 2048)  Batches: 1 (originally 1)  Memory Usage: 291kB
-              Buffers: shared hit=815 read=369
-              ->  Nested Loop  (cost=6.61..2276.37 rows=1900 width=73) (actual time=0.148..4.277 rows=2360.00 loops=1)
-                    Buffers: shared hit=815 read=369
-                    ->  Nested Loop  (cost=6.18..642.42 rows=190 width=56) (actual time=0.124..1.045 rows=236.00 loops=1)
-                          Buffers: shared hit=234 read=6
-                          ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=40) (actual time=0.042..0.043 rows=1.00 loops=1)
-                                Index Cond: (customer_id = 15)
-                                Index Searches: 1
-                                Buffers: shared hit=3 read=3
-                          ->  Bitmap Heap Scan on orders o  (cost=5.90..632.21 rows=190 width=24) (actual time=0.079..0.953 rows=236.00 loops=1)
-                                Recheck Cond: (customer_id = 15)
-                                Heap Blocks: exact=231
-                                Buffers: shared hit=231 read=3
-                                ->  Bitmap Index Scan on idx_orders_customer_id  (cost=0.00..5.85 rows=190 width=0) (actual time=0.050..0.051 rows=236.00 loops=1)
-                                      Index Cond: (customer_id = 15)
-                                      Index Searches: 1
-                                      Buffers: shared read=3
-                    ->  Index Scan using idx_order_items_order_id on order_items oi  (cost=0.43..8.50 rows=10 width=25) (actual time=0.012..0.013 rows=10.00 loops=236)
-                          Index Cond: (order_id = o.order_id)
-                          Index Searches: 236
-                          Buffers: shared hit=581 read=363
-  ->  Hash  (cost=74.00..74.00 rows=3000 width=25) (actual time=0.639..0.640 rows=3000.00 loops=1)
-        Buckets: 4096  Batches: 1  Memory Usage: 219kB
-        Buffers: shared hit=44
-        ->  Seq Scan on products p  (cost=0.00..74.00 rows=3000 width=25) (actual time=0.010..0.258 rows=3000.00 loops=1)
-              Buffers: shared hit=44
-Planning:
-  Buffers: shared hit=397 read=15
-Planning Time: 1.506 ms
-Execution Time: 8.649 ms
->>>>>>> 06a2f89 (run_all.sh tested and many fixed)
+  Buffers: shared hit=403 read=9
+Planning Time: 2.663 ms
+Execution Time: 13.957 ms

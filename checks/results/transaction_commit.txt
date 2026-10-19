@@ -1,4 +1,4 @@
-psql:/project/scenarios/transaction_commit.sql:116: NOTICE:  Создан заказ 10002, оформлена корзина 1
+psql:/project/scenarios/transaction_commit.sql:112: NOTICE:  Создан заказ 10002, оформлена корзина 1
  order_id | status  |      email       |  article  | quantity | fixed_price 
 ----------+---------+------------------+-----------+----------+-------------
     10002 | created | ivan@example.com | HOD-GRY-M |        1 |     3999.00

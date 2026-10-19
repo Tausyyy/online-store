@@ -5,19 +5,25 @@
 
 
 ===== INSERT ... SELECT: 5 замеров =====
-Time: 107.238 ms
-Time: 91.609 ms
-Time: 81.684 ms
-Time: 81.336 ms
-Time: 82.820 ms
+Time: 170.804 ms
+Time: 166.791 ms
+Time: 160.684 ms
+Time: 139.689 ms
+Time: 139.147 ms
 
 ===== COPY: 5 замеров =====
-Time: 127.657 ms
-Time: 122.198 ms
-Time: 122.006 ms
-Time: 123.583 ms
-Time: 123.224 ms
-psql:/project/scripts/data_generator/benchmark.sql:278: NOTICE:  Проверка пройдена: source=100000, INSERT=100000, COPY=100000
+Подготовка CSV и загрузка измеряются отдельно в каждом повторе.
+Time: 62.005 ms
+Time: 213.997 ms
+Time: 57.540 ms
+Time: 201.277 ms
+Time: 61.394 ms
+Time: 192.657 ms
+Time: 92.065 ms
+Time: 192.984 ms
+Time: 58.657 ms
+Time: 197.130 ms
+psql:/project/scripts/data_generator/benchmark.sql:208: NOTICE:  Проверка пройдена: source=100000, INSERT=100000, COPY=100000
       dataset      | row_count 
 -------------------+-----------
  source            |    100000
