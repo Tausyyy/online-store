@@ -1,11 +1,5 @@
-#!/usr/bin/env bash
-# Большой набор (3 000 000 строк в order_items) и замеры оптимизации до и после.
-# Занимает 10-30 минут. Планы EXPLAIN сохраняются в optimization/plans/.
-# Запуск: bash run_big.sh   (на Windows - в Git Bash)
-
 set -euo pipefail
 
-# Нужно для Git Bash на Windows: иначе пути вида /project/... портятся.
 export MSYS_NO_PATHCONV=1
 
 cd "$(dirname "$0")"
@@ -26,11 +20,14 @@ echo "[2/4] Схема и миграция 001"
 $PSQL -f /project/migrations/create_tables.sql.sql
 $PSQL -f /project/migrations/001_add_constraints.up.sql
 
-echo "[3/4] Генератор: seed=42, 3000000 строк в order_items"
+echo "[3/5] Генератор: seed=42, 3000000 строк в order_items"
 $PSQL -v tag=big -v seed=42 -v order_items_count=3000000 \
     -f /project/scripts/data_generator/generate_data.sql
 
-echo "[4/4] Замеры оптимизации до и после"
+echo "[4/5] Пять бизнес-запросов на нагрузочном наборе"
+$PSQL -f /project/queries/business_queries.sql 2>&1 | tee checks/results/business_queries_big.txt
+
+echo "[5/5] Замеры оптимизации до и после"
 docker compose exec -T -e DATABASE_URL=postgresql://postgres:postgres@localhost:5432/online_store \
     db bash /project/optimization/run_benchmark.sh 2>&1 | tee checks/results/optimization_benchmark.txt
 

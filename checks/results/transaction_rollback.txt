@@ -1,4 +1,10 @@
-psql:/project/scenarios/transaction_rollback.sql:99: NOTICE:  Внутри транзакции создан заказ 10003, остаток временно уменьшен
+    set_config    
+------------------
+ ivan@example.com
+(1 row)
+
+psql:/project/scenarios/transaction_rollback.sql:109: NOTICE:  Заказ 10003 и списание остатка подготовлены; отправляем платёж на авторизацию
+psql:/project/scenarios/transaction_rollback.sql:109: NOTICE:  Бизнес-ошибка: PAYMENT_DECLINED: платёжный шлюз отклонил оплату. Транзакция будет отменена.
  orders_before | orders_after | items_before | items_after | tshirt_stock_before | tshirt_stock_after | hoodie_stock_before | hoodie_stock_after 
 ---------------+--------------+--------------+-------------+---------------------+--------------------+---------------------+--------------------
          10002 |        10002 |       100003 |      100003 |                  18 |                 18 |                   9 |                  9

@@ -13,6 +13,18 @@ BEGIN
     END IF;
 END $$;
 
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM sku WHERE price <> ROUND(price, 2))
+       OR EXISTS (SELECT 1 FROM order_items WHERE fixed_price <> ROUND(fixed_price, 2)) THEN
+        RAISE EXCEPTION 'Есть цены с более чем 2 знаками после запятой — миграция остановлена, чтобы не округлить их.';
+    END IF;
+END $$;
+
+UPDATE carts
+SET created_at = CURRENT_TIMESTAMP
+WHERE created_at IS NULL;
+
 ALTER TABLE categories
     ALTER COLUMN name TYPE VARCHAR(100),
     ALTER COLUMN name SET NOT NULL,
@@ -37,7 +49,7 @@ ALTER TABLE products
     ALTER COLUMN publication_status SET DEFAULT 'draft';
 
 ALTER TABLE products
-    DROP CONSTRAINT products_category_id_fkey,
+    DROP CONSTRAINT IF EXISTS products_category_id_fkey,
     ADD CONSTRAINT fk_products_category
         FOREIGN KEY (category_id) REFERENCES categories (category_id)
         ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -60,7 +72,7 @@ ALTER TABLE sku
     ALTER COLUMN status SET DEFAULT 'draft';
 
 ALTER TABLE sku
-    DROP CONSTRAINT sku_product_id_fkey,
+    DROP CONSTRAINT IF EXISTS sku_product_id_fkey,
     ADD CONSTRAINT fk_sku_product
         FOREIGN KEY (product_id) REFERENCES products (product_id)
         ON DELETE CASCADE ON UPDATE CASCADE;
@@ -74,7 +86,7 @@ ALTER TABLE carts
     ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 
 ALTER TABLE carts
-    DROP CONSTRAINT carts_customer_id_fkey,
+    DROP CONSTRAINT IF EXISTS carts_customer_id_fkey,
     ADD CONSTRAINT fk_carts_customer
         FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
         ON DELETE CASCADE ON UPDATE CASCADE;
@@ -86,13 +98,13 @@ ALTER TABLE cart_items
     ADD CONSTRAINT cart_items_quantity_check CHECK (quantity > 0);
 
 ALTER TABLE cart_items
-    DROP CONSTRAINT cart_items_cart_id_fkey,
+    DROP CONSTRAINT IF EXISTS cart_items_cart_id_fkey,
     ADD CONSTRAINT fk_cart_items_cart
         FOREIGN KEY (cart_id) REFERENCES carts (cart_id)
         ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE cart_items
-    DROP CONSTRAINT cart_items_sku_id_fkey,
+    DROP CONSTRAINT IF EXISTS cart_items_sku_id_fkey,
     ADD CONSTRAINT fk_cart_items_sku
         FOREIGN KEY (sku_id) REFERENCES sku (sku_id)
         ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -115,7 +127,7 @@ ALTER TABLE orders
     ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 
 ALTER TABLE orders
-    DROP CONSTRAINT orders_customer_id_fkey,
+    DROP CONSTRAINT IF EXISTS orders_customer_id_fkey,
     ADD CONSTRAINT fk_orders_customer
         FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
         ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -130,13 +142,13 @@ ALTER TABLE order_items
     ADD CONSTRAINT order_items_fixed_price_check CHECK (fixed_price >= 0);
 
 ALTER TABLE order_items
-    DROP CONSTRAINT order_items_order_id_fkey,
+    DROP CONSTRAINT IF EXISTS order_items_order_id_fkey,
     ADD CONSTRAINT fk_order_items_order
         FOREIGN KEY (order_id) REFERENCES orders (order_id)
         ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE order_items
-    DROP CONSTRAINT order_items_sku_id_fkey,
+    DROP CONSTRAINT IF EXISTS order_items_sku_id_fkey,
     ADD CONSTRAINT fk_order_items_sku
         FOREIGN KEY (sku_id) REFERENCES sku (sku_id)
         ON DELETE RESTRICT ON UPDATE CASCADE;

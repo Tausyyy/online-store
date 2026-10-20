@@ -80,10 +80,15 @@ END;
 $$;
 
 
+-- setseed задаёт состояние PRNG PostgreSQL для последующих random() в этой сессии.
+-- Это обеспечивает повторяемость в совместимой версии PostgreSQL и при том же порядке
+-- вызовов random(), но не обещает побитовую идентичность между версиями PostgreSQL.
 SELECT setseed(
     current_setting('app.gen_seed')::BIGINT / 500000000.0 - 1.0
 );
 
+-- Все размеры связанных таблиц рассчитываются от одного item_count. При изменении
+-- масштаба не требуется вручную синхронизировать числа в нескольких местах.
 CREATE TEMP TABLE gen_params ON COMMIT DROP AS
 SELECT
     current_setting('app.gen_items')::BIGINT AS item_count,
@@ -203,7 +208,11 @@ SELECT
     CASE
         WHEN p.publication_status <> 'published' THEN 0
         WHEN v.variant_n IN (1, 2) THEN
-            3000 + FLOOR(random() * 5001)::INTEGER
+            CASE
+                -- Редкие дефицитные позиции (1..9) для осмысленного Q5.
+                WHEN p.n % 100 = 1 THEN 1 + (p.n % 9)
+                ELSE 3000 + FLOOR(random() * 5001)::INTEGER
+            END
         WHEN v.variant_n = 3 AND p.n % 5 <> 0 THEN
             3000 + FLOOR(random() * 5001)::INTEGER
         ELSE 0
@@ -409,7 +418,7 @@ SELECT
     initial_stock
 FROM gen_sku_map
 WHERE initial_status = 'on_sale'
-  AND initial_stock > 0;
+  AND initial_stock >= 10;
 
 
 DO $$
@@ -581,7 +590,7 @@ SELECT
 FROM gen_sku_map sm
 JOIN sku s ON s.sku_id = sm.sku_id
 WHERE s.status = 'on_sale'
-  AND s.stock_quantity > 0;
+  AND s.stock_quantity >= 10;
 
 
 CREATE TEMP TABLE gen_cart_counts ON COMMIT DROP AS

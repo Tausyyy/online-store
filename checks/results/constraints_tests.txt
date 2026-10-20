@@ -52,38 +52,20 @@ CREATE FUNCTION
  
 (1 row)
 
-psql:/project/tests/negative_constraints.sql:80: NOTICE:  PASS: categories.name NOT NULL (SQLSTATE 23502)
-psql:/project/tests/negative_constraints.sql:88: NOTICE:  PASS: customers.email UNIQUE (SQLSTATE 23505)
+psql:/project/tests/negative_constraints.sql:79: NOTICE:  PASS: categories.name NOT NULL (SQLSTATE 23502)
+psql:/project/tests/negative_constraints.sql:86: NOTICE:  PASS: customers.email UNIQUE (SQLSTATE 23505)
  assert_constraint_violation 
 -----------------------------
  
 (1 row)
 
-psql:/project/tests/negative_constraints.sql:97: NOTICE:  PASS: sku.article UNIQUE (SQLSTATE 23505)
+psql:/project/tests/negative_constraints.sql:94: NOTICE:  PASS: sku.article UNIQUE (SQLSTATE 23505)
  assert_constraint_violation 
 -----------------------------
  
 (1 row)
 
- assert_constraint_violation 
------------------------------
- 
-(1 row)
-
-psql:/project/tests/negative_constraints.sql:106: NOTICE:  PASS: sku.price >= 0 (SQLSTATE 23514)
- assert_constraint_violation 
------------------------------
- 
-(1 row)
-
-psql:/project/tests/negative_constraints.sql:115: NOTICE:  PASS: sku.stock_quantity >= 0 (SQLSTATE 23514)
-psql:/project/tests/negative_constraints.sql:124: NOTICE:  PASS: cart_items.quantity > 0 (SQLSTATE 23514)
- assert_constraint_violation 
------------------------------
- 
-(1 row)
-
-psql:/project/tests/negative_constraints.sql:133: NOTICE:  PASS: order_items.quantity > 0 (SQLSTATE 23514)
+psql:/project/tests/negative_constraints.sql:102: NOTICE:  PASS: sku.price >= 0 (SQLSTATE 23514)
  assert_constraint_violation 
 -----------------------------
  
@@ -94,14 +76,32 @@ psql:/project/tests/negative_constraints.sql:133: NOTICE:  PASS: order_items.qua
  
 (1 row)
 
-psql:/project/tests/negative_constraints.sql:142: NOTICE:  PASS: order_items.fixed_price >= 0 (SQLSTATE 23514)
-psql:/project/tests/negative_constraints.sql:150: NOTICE:  PASS: products.category_id FOREIGN KEY (SQLSTATE 23503)
+psql:/project/tests/negative_constraints.sql:110: NOTICE:  PASS: sku.stock_quantity >= 0 (SQLSTATE 23514)
+psql:/project/tests/negative_constraints.sql:118: NOTICE:  PASS: cart_items.quantity > 0 (SQLSTATE 23514)
  assert_constraint_violation 
 -----------------------------
  
 (1 row)
 
-psql:/project/tests/negative_constraints.sql:158: NOTICE:  PASS: sku.product_id FOREIGN KEY (SQLSTATE 23503)
+psql:/project/tests/negative_constraints.sql:126: NOTICE:  PASS: order_items.quantity > 0 (SQLSTATE 23514)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:134: NOTICE:  PASS: order_items.fixed_price >= 0 (SQLSTATE 23514)
+psql:/project/tests/negative_constraints.sql:141: NOTICE:  PASS: products.category_id FOREIGN KEY (SQLSTATE 23503)
+ assert_constraint_violation 
+-----------------------------
+ 
+(1 row)
+
+psql:/project/tests/negative_constraints.sql:148: NOTICE:  PASS: sku.product_id FOREIGN KEY (SQLSTATE 23503)
  assert_constraint_violation 
 -----------------------------
  
@@ -126,8 +126,8 @@ DO
 ROLLBACK
 [8/8] Повторный UP после DOWN
 BEGIN
-psql:/project/migrations/001_add_constraints.up.sql:7: NOTICE:  relation "schema_migrations" already exists, skipping
 CREATE TABLE
+psql:/project/migrations/001_add_constraints.up.sql:7: NOTICE:  relation "schema_migrations" already exists, skipping
 DO
 ALTER TABLE
 ALTER TABLE

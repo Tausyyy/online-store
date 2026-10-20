@@ -15,6 +15,8 @@ JOIN sku s ON oi.sku_id = s.sku_id
 JOIN products p ON s.product_id = p.product_id
 WHERE c.customer_id = 15;
 
+
+
 SELECT
     p.product_id,
     p.name AS product_name,
@@ -28,6 +30,8 @@ GROUP BY p.product_id, p.name
 ORDER BY total_sold DESC
 LIMIT 10;
 
+
+
 SELECT
     c.name AS category,
     SUM(oi.quantity * oi.fixed_price) AS revenue
@@ -40,6 +44,8 @@ WHERE o.status = 'delivered'
 GROUP BY c.name
 ORDER BY revenue DESC;
 
+
+
 SELECT
     c.customer_id,
     c.email,
@@ -49,6 +55,8 @@ JOIN orders o ON c.customer_id = o.customer_id
 GROUP BY c.customer_id, c.email
 HAVING COUNT(o.order_id) >= 5;
 
+
+
 SELECT
     p.name AS product_name,
     s.size,
@@ -56,5 +64,7 @@ SELECT
     s.stock_quantity
 FROM products p
 JOIN sku s ON p.product_id = s.product_id
-WHERE s.stock_quantity < 10
+WHERE s.stock_quantity > 0
+  AND s.stock_quantity < 10
+  AND s.status = 'on_sale'
 ORDER BY s.stock_quantity;

@@ -1,6 +1,9 @@
 \set ON_ERROR_STOP on
+\if :{?customer_email}
+\else
+  \set customer_email 'ivan@example.com'
+\endif
 
--- Сохраняем исходное состояние для сравнения.
 SELECT
     (SELECT COUNT(*) FROM orders) AS orders_before,
     (SELECT COUNT(*) FROM order_items) AS items_before,
@@ -9,6 +12,7 @@ SELECT
 \gset
 
 BEGIN;
+SELECT set_config('app.rollback_customer_email', :'customer_email', true);
 
 DO $$
 DECLARE
@@ -16,22 +20,21 @@ DECLARE
     v_cart_id BIGINT;
     v_order_id BIGINT;
     v_phone VARCHAR(20);
+    v_payment_authorized BOOLEAN := FALSE; -- имитация отказа платёжного шлюза
 BEGIN
     SELECT customer_id, phone
     INTO v_customer_id, v_phone
     FROM customers
-    WHERE email = 'ivan@example.com';
+    WHERE email = current_setting('app.rollback_customer_email');
 
     IF v_customer_id IS NULL THEN
-        RAISE EXCEPTION 'Покупатель ivan@example.com не найден';
+        RAISE EXCEPTION 'Покупатель % не найден', current_setting('app.rollback_customer_email');
     END IF;
 
-    -- Создаём временную корзину внутри транзакции.
     INSERT INTO carts (customer_id, status, created_at)
     VALUES (v_customer_id, 'active', CURRENT_TIMESTAMP)
     RETURNING cart_id INTO v_cart_id;
 
-    -- Добавляем тестовые товары.
     INSERT INTO cart_items (cart_id, sku_id, quantity)
     SELECT v_cart_id, sku_id, 1
     FROM sku
@@ -45,7 +48,6 @@ BEGIN
         RAISE EXCEPTION 'Нет доступной футболки для теста';
     END IF;
 
-    -- Блокируем товары и проверяем остатки и статус.
     PERFORM s.sku_id
     FROM sku s
     JOIN cart_items ci ON ci.sku_id = s.sku_id
@@ -64,7 +66,6 @@ BEGIN
         RAISE EXCEPTION 'Проверка товара или остатка не пройдена';
     END IF;
 
-    -- Создаём временный заказ со статусом created.
     INSERT INTO orders (
         customer_id, status, customer_name, customer_phone,
         delivery_method, payment_method, created_at
@@ -75,14 +76,12 @@ BEGIN
     )
     RETURNING order_id INTO v_order_id;
 
-    -- Добавляем позицию заказа.
     INSERT INTO order_items (order_id, sku_id, quantity, fixed_price)
     SELECT v_order_id, ci.sku_id, ci.quantity, s.price
     FROM cart_items ci
     JOIN sku s ON s.sku_id = ci.sku_id
     WHERE ci.cart_id = v_cart_id;
 
-    -- Списываем товар и закрываем корзину.
     UPDATE sku s
     SET stock_quantity = s.stock_quantity - ci.quantity
     FROM cart_items ci
@@ -94,14 +93,23 @@ BEGIN
     WHERE cart_id = v_cart_id;
 
     RAISE NOTICE
-        'Внутри транзакции создан заказ %, остаток временно уменьшен',
+        'Заказ % и списание остатка подготовлены; отправляем платёж на авторизацию',
         v_order_id;
+
+    -- Реалистичная бизнес-ошибка: платёжный провайдер отклонил авторизацию.
+    -- Вложенный блок ловит ошибку, чтобы сценарий мог выполнить явный ROLLBACK
+    -- и сравнить состояние до/после, не прекращая psql на ON_ERROR_STOP.
+    BEGIN
+        IF NOT v_payment_authorized THEN
+            RAISE EXCEPTION 'PAYMENT_DECLINED: платёжный шлюз отклонил оплату';
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        RAISE NOTICE 'Бизнес-ошибка: %. Транзакция будет отменена.', SQLERRM;
+    END;
 END $$;
 
--- Отменяем создание корзины, заказа, позиции и списание товара.
 ROLLBACK;
 
--- Сравниваем состояние после отката с исходным.
 SELECT
     (SELECT COUNT(*) FROM orders) AS orders_after,
     (SELECT COUNT(*) FROM order_items) AS items_after,
