@@ -1,9 +1,3 @@
-#!/usr/bin/env bash
-# Использование:
-#   ./migrate.sh up       — применить все ещё не применённые миграции
-#   ./migrate.sh down     — откатить последнюю применённую миграцию
-#   ./migrate.sh status   — показать, что уже применено
-
 set -euo pipefail
 
 MIGRATIONS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../migrations" && pwd)"

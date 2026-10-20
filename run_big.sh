@@ -20,8 +20,8 @@ echo "[2/4] Схема и миграция 001"
 $PSQL -f /project/migrations/create_tables.sql.sql
 $PSQL -f /project/migrations/001_add_constraints.up.sql
 
-echo "[3/5] Генератор: seed=42, 3000000 строк в order_items"
-$PSQL -v tag=big -v seed=42 -v order_items_count=3000000 \
+echo "[3/5] Генератор: seed=52, 3000000 строк в order_items"
+$PSQL -v tag=big -v seed=52 -v order_items_count=3000000 \
     -f /project/scripts/data_generator/generate_data.sql
 
 echo "[4/5] Пять бизнес-запросов на нагрузочном наборе"

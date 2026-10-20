@@ -1,5 +1,3 @@
-# Запуск базы данных одной командой:   docker compose up -d
-# Остановить и УДАЛИТЬ данные:         docker compose down -v
 services:
   db:
     image: postgres:18

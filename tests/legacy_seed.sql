@@ -1,5 +1,3 @@
--- Проверка совместимости UP с данными, допустимыми исходной схемой.
-
 INSERT INTO categories(name, description)
 VALUES ('Legacy category', 'Allowed by old schema');
 
