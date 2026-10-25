@@ -1,0 +1,64 @@
+--------------------------------------------
+Резервное копирование и восстановление
+Дата: 2026-10-25 14:46:53 +07
+Исходная БД: online_store
+БД восстановления: online_store_restore
+--------------------------------------------
+/var/run/postgresql:5432 - accepting connections
+
+1. Создание резервной копии
+Файл: /home/loony/online-store/backups/online_store.dump
+964K	/home/loony/online-store/backups/online_store.dump
+
+2. Проверка архива
+Архив читается pg_restore.
+
+3. Подготовка чистой БД для восстановления
+Будет пересоздана только БД online_store_restore.
+
+4. Восстановление
+Восстановление завершено без ошибок.
+
+5. Сравнение количества записей
+Исходная БД:
+cart_items|1590
+carts|2001
+categories|23
+customers|1003
+order_items|100003
+orders|10002
+products|503
+schema_migrations|1
+sku|2504
+
+Восстановленная БД:
+cart_items|1590
+carts|2001
+categories|23
+customers|1003
+order_items|100003
+orders|10002
+products|503
+schema_migrations|1
+sku|2504
+Количество записей совпадает во всех 9 таблицах.
+
+6. Сравнение ограничений
+Исходная БД:
+c|5
+f|8
+n|42
+p|9
+u|3
+
+Восстановленная БД:
+c|5
+f|8
+n|42
+p|9
+u|3
+Количество ограничений совпадает.
+
+Резервная копия успешно создана и восстановлена
+Резервная копия: /home/loony/online-store/backups/online_store.dump
+Результаты проверок: /home/loony/online-store/backups/backup_restore.txt
