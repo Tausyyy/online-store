@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKUP_DIR="$ROOT_DIR/backups"
 RESULTS_DIR="$ROOT_DIR/backups"
 BACKUP_FILE="$BACKUP_DIR/online_store.dump"
