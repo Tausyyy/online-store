@@ -1,0 +1,33 @@
+ set_config 
+------------
+ 100000
+(1 row)
+
+
+===== INSERT ... SELECT: 5 замеров =====
+Time: 100.082 ms
+Time: 90.308 ms
+Time: 88.120 ms
+Time: 87.828 ms
+Time: 89.008 ms
+
+===== COPY: 5 замеров =====
+Подготовка CSV и загрузка измеряются отдельно в каждом повторе.
+Time: 49.496 ms
+Time: 135.374 ms
+Time: 55.502 ms
+Time: 140.562 ms
+Time: 47.550 ms
+Time: 140.945 ms
+Time: 52.470 ms
+Time: 135.181 ms
+Time: 46.078 ms
+Time: 134.788 ms
+psql:/project/scripts/data_generator/benchmark.sql:208: NOTICE:  Проверка пройдена: source=100000, INSERT=100000, COPY=100000
+      dataset      | row_count 
+-------------------+-----------
+ source            |    100000
+ INSERT ... SELECT |    100000
+ COPY              |    100000
+(3 rows)
+

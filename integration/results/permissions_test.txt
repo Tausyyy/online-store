@@ -1,0 +1,19 @@
+   rolname    | rolsuper | rolcreatedb | rolcreaterole 
+--------------+----------+-------------+---------------
+ lab4_admin   | f        | f           | f
+ lab4_analyst | f        | f           | f
+ lab4_app     | f        | f           | f
+(3 rows)
+
+  role_name   | can_select | can_insert | can_update | can_delete 
+--------------+------------+------------+------------+------------
+ lab4_admin   | t          | t          | t          | t
+ lab4_analyst | t          | f          | f          | f
+ lab4_app     | t          | t          | t          | t
+(3 rows)
+
+ app_is_not_superuser 
+----------------------
+ t
+(1 row)
+

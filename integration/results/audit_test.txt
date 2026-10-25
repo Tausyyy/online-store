@@ -1,0 +1,24 @@
+=== Аудит критических операций ===
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: INSERT заказа записан в аудит (db_user=postgres)
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: UPDATE без реального изменения не создаёт записей
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: смена статуса created -> paid записана, изменённые поля: {status}
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: изменение остатка SKU не аудируется
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: изменение цены SKU записано (1999.00 -> 2000.00)
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: смена пароля записана без значений хешей, изменённые поля: {password_hash}
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: смена роли покупателя записана
+psql:/project/integration/sql/audit_test.sql:88: NOTICE:  PASS: удаление заказа и каскадное удаление позиции записаны
+psql:/project/integration/sql/audit_test.sql:113: NOTICE:  PASS: аудит фиксирует роль (lab4_app) и покупателя (2) из контекста приложения
+psql:/project/integration/sql/audit_test.sql:160: NOTICE:  PASS: app не может читать audit_log
+psql:/project/integration/sql/audit_test.sql:160: NOTICE:  PASS: app не может писать в audit_log напрямую
+psql:/project/integration/sql/audit_test.sql:160: NOTICE:  PASS: analyst не может читать audit_log
+psql:/project/integration/sql/audit_test.sql:160: NOTICE:  PASS: admin читает audit_log (записей в транзакции: 8)
+psql:/project/integration/sql/audit_test.sql:160: NOTICE:  PASS: admin не может изменять audit_log
+psql:/project/integration/sql/audit_test.sql:160: NOTICE:  PASS: admin не может удалять записи audit_log
+psql:/project/integration/sql/audit_test.sql:186: NOTICE:  PASS: триггер блокирует UPDATE даже для суперпользователя
+psql:/project/integration/sql/audit_test.sql:186: NOTICE:  PASS: триггер блокирует DELETE даже для суперпользователя
+psql:/project/integration/sql/audit_test.sql:186: NOTICE:  PASS: триггер блокирует TRUNCATE даже для суперпользователя
+=== Аудит: последние записи в базе (после отката теста остаются только реальные операции) ===
+ audit_id | occurred_at | db_user | table_name | operation | row_pk 
+----------+-------------+---------+------------+-----------+--------
+(0 rows)
+

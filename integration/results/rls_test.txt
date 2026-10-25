@@ -1,0 +1,16 @@
+=== RLS: доступ к чужим заказам ===
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  Покупатель A=1, покупатель B=2, чужой заказ=1
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: app (покупатель A) видит только свои заказы: 1 из 10002 всего
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: чужих заказов в выборке нет
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: SELECT чужого заказа по order_id возвращает 0 строк
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: позиции чужого заказа не видны
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: позиции своего заказа видны (2)
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: собственная корзина видна
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: UPDATE чужого заказа затронул 0 строк
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: DELETE чужого заказа затронул 0 строк
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: INSERT заказа от имени чужого покупателя отклонён политикой RLS
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: смена владельца заказа отклонена политикой RLS
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: INSERT собственного заказа разрешён
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: при контексте покупателя B виден его заказ и не виден заказ покупателя A
+psql:/project/integration/sql/rls_test.sql:128: NOTICE:  PASS: без app.customer_id заказов не видно (доступ закрыт по умолчанию)
+psql:/project/integration/sql/rls_test.sql:128: ERROR:  FAIL: analyst видит 10003 из 10002 заказов
