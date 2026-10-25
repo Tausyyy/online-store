@@ -1,0 +1,13 @@
+== F1. Старую primary (порт 5433) запускаем КАК ЕСТЬ, пока реплика (5434) уже повышена ==
+старая primary: pg_is_in_recovery = f  (принимает записи!)
+запись на старой primary, id = 8
+failure_probe: старая primary = 8 строк, новая primary = 8 строк
+последняя запись: старая = split-brain-old-primary; новая = written-on-promoted
+
+== F2. Пересборка старой primary как replica новой ==
+pg_basebackup: код возврата 0
+новая primary (5434): pg_stat_replication = streaming/async
+бывшая primary (5433): pg_is_in_recovery = t
+failure_probe: новая = 8, бывшая = 8
+строк 'split-brain-old-primary' на бывшей primary: 0 (ожидается 0 — потеряна при пересборке)
+md5 orders: новая=320beaf361f19412c91704b926ea7cc7 бывшая=320beaf361f19412c91704b926ea7cc7

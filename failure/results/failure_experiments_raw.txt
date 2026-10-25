@@ -1,0 +1,104 @@
+==============================================================
+ Эксперименты с отказами   MODE=local   2026-10-25 12:29:53 UTC
+==============================================================
+PostgreSQL 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit
+
+[12:29:53] Подготовка: таблица-пробник failure_probe (пересоздаётся на primary)
+
+[12:29:54] E0. Исходное состояние
+primary: pg_stat_replication = streaming/async
+replica: walreceiver         = streaming, in_recovery = t
+[12:29:54] APP WRITE(primary) OK   id=1  (baseline)
+[12:29:55] APP READ (replica) OK   rows|max_id=1|1
+  categories     MATCH  3 строк
+  customers      MATCH  3 строк
+  products       MATCH  3 строк
+  sku            MATCH  4 строк
+  carts          MATCH  1 строк
+  cart_items     MATCH  2 строк
+  orders         MATCH  1 строк
+  order_items    MATCH  1 строк
+  failure_probe  MATCH  1 строк
+  constraints    MATCH  c=5,f=8,p=10,u=3
+  FK-сироты      primary=0 replica=0 (ожидается 0 и 0)
+  ИТОГ: целостность подтверждена
+
+[12:29:55] E1. ОСТАНОВКА REPLICA
+replica остановлена
+[12:29:55] APP WRITE(primary) OK   id=2  (while-replica-down-1)
+[12:29:55] APP WRITE(primary) OK   id=3  (while-replica-down-2)
+[12:29:55] APP WRITE(primary) OK   id=4  (while-replica-down-3)
+primary: pg_stat_replication = нет подключённых реплик
+[12:29:55] APP READ (replica) FAIL: psql: error: connection to server on socket "/tmp/pgl/.s.PGSQL.5434" failed: No such file or directory
+
+[12:29:55] E1. Запуск replica и догоняние
+простой replica: 0.3 с
+догнала за 0.0 с (failure_probe: primary=4 replica=4)
+primary: pg_stat_replication = streaming/async
+replica: walreceiver         = streaming
+-- replica, лог (последние строки):
+2026-10-25 12:29:55.697 UTC [3791] LOG:  entering standby mode
+2026-10-25 12:29:55.698 UTC [3791] LOG:  redo starts at 0/50484A8
+2026-10-25 12:29:55.698 UTC [3791] LOG:  consistent recovery state reached at 0/5072F08
+2026-10-25 12:29:55.698 UTC [3788] LOG:  database system is ready to accept read-only connections
+2026-10-25 12:29:55.699 UTC [3791] LOG:  invalid magic number 0000 in WAL segment 000000010000000000000005, LSN 0/5074000, offset 475136
+2026-10-25 12:29:55.705 UTC [3792] LOG:  started streaming WAL from primary at 0/5000000 on timeline 1
+  categories     MATCH  3 строк
+  customers      MATCH  3 строк
+  products       MATCH  3 строк
+  sku            MATCH  4 строк
+  carts          MATCH  1 строк
+  cart_items     MATCH  2 строк
+  orders         MATCH  1 строк
+  order_items    MATCH  1 строк
+  failure_probe  MATCH  4 строк
+  constraints    MATCH  c=5,f=8,p=10,u=3
+  FK-сироты      primary=0 replica=0 (ожидается 0 и 0)
+  ИТОГ: целостность подтверждена
+
+[12:29:56] E2. ОСТАНОВКА PRIMARY
+[12:29:56] APP WRITE(primary) OK   id=5  (before-primary-down)
+primary остановлена
+[12:29:57] APP WRITE(primary) FAIL (while-primary-down): psql: error: connection to server on socket "/tmp/pgl/.s.PGSQL.5433" failed: No such file or directory
+[12:29:57] APP READ (replica) OK   rows|max_id=5|5
+[12:29:57] APP WRITE(replica) -> ERROR:  cannot execute INSERT in a read-only transaction
+replica: in_recovery = t, walreceiver = нет walreceiver
+replica: последний применённый WAL = 0/5075190, задержка применения = 00:00:01.198947
+-- replica, лог (последние строки):
+2026-10-25 12:29:57.189 UTC [3791] LOG:  invalid record length at 0/5075190: expected at least 24, got 0
+2026-10-25 12:29:57.191 UTC [3946] FATAL:  could not connect to the primary server: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+		Is the server running on that host and accepting TCP/IP connections?
+2026-10-25 12:29:57.191 UTC [3791] LOG:  waiting for WAL to become available at 0/50751A8
+2026-10-25 12:29:57.302 UTC [3965] ERROR:  cannot execute INSERT in a read-only transaction
+2026-10-25 12:29:57.302 UTC [3965] STATEMENT:  INSERT INTO failure_probe(note) VALUES ('write-to-replica')
+
+[12:30:00] E2. Запуск primary и переподключение replica
+простой primary: 3.3 с
+replica снова streaming через 2.2 с после старта primary
+[12:30:02] APP WRITE(primary) OK   id=6  (after-primary-up-1)
+[12:30:02] APP WRITE(primary) OK   id=7  (after-primary-up-2)
+догнала за 0.1 с (failure_probe: primary=7 replica=7)
+  categories     MATCH  3 строк
+  customers      MATCH  3 строк
+  products       MATCH  3 строк
+  sku            MATCH  4 строк
+  carts          MATCH  1 строк
+  cart_items     MATCH  2 строк
+  orders         MATCH  1 строк
+  order_items    MATCH  1 строк
+  failure_probe  MATCH  7 строк
+  constraints    MATCH  c=5,f=8,p=10,u=3
+  FK-сироты      primary=0 replica=0 (ожидается 0 и 0)
+  ИТОГ: целостность подтверждена
+
+[12:30:02] E3. АВАРИЙНОЕ ПЕРЕКЛЮЧЕНИЕ: primary упал, replica повышается до primary
+[12:30:03] APP WRITE(primary) FAIL (primary-dead): psql: error: connection to server on socket "/tmp/pgl/.s.PGSQL.5433" failed: No such file or directory
+replica: pg_is_in_recovery до promote = t
+pg_promote: t
+replica: pg_is_in_recovery после promote = f
+[12:30:03] запись на повышенную replica: 39
+failure_probe на повышенной replica: 8
+FK-сироты на повышенной replica: 0
+ВНИМАНИЕ: старую primary нельзя запускать как есть (split-brain) — см. runbook.md, сценарий C.
+
+[12:30:03] Эксперименты завершены. Сырой лог: /home/claude/repo/online-store-lab4-roles/failure/results/failure_experiments_raw.txt
