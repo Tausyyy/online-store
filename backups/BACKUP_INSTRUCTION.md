@@ -21,5 +21,5 @@
 
 ```bash
 docker compose up -d db
-chmod +x backup_restore.sh
-./backup_restore.sh
+chmod +x backups/backup_restore.sh
+./backups/backup_restore.sh
