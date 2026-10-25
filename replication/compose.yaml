@@ -1,0 +1,44 @@
+services:
+  primary:
+    image: postgres:16
+    container_name: replication-primary
+    environment:
+      POSTGRES_DB: online_store
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_pass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    ports:
+      - "5433:5432"
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+      - ./primary/init:/docker-entrypoint-initdb.d
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - max_wal_senders=5
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d online_store"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  replica:
+    image: postgres:16
+    container_name: replication-replica
+    depends_on:
+      primary:
+        condition: service_healthy
+    environment:
+      POSTGRES_PASSWORD: postgres_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+      - ./replica/replica.sh:/replica.sh:ro
+    entrypoint: ["bash", "/replica.sh"]
+
+volumes:
+  primary_data:
+  replica_data:
