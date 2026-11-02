@@ -1,26 +1,46 @@
 --------------------------------------------
 Резервное копирование и восстановление
-Дата: 2026-10-25 14:55:11 +07
+Дата: 2026-11-02 16:41:29 +07
+Исходный сервис: db
+Сервис восстановления: restore
 Исходная БД: online_store
 БД восстановления: online_store_restore
 --------------------------------------------
-/var/run/postgresql:5432 - accepting connections
 
-1. Создание резервной копии
-Файл: /home/loony/online-store/backups/online_store.dump
+1. Проверка исходной базы
+/var/run/postgresql:5432 - accepting connections
+Исходная база доступна.
+
+2. Создание резервной копии
+Резервная копия создана:
+/home/loony/online-store/backups/online_store.dump
 964K	/home/loony/online-store/backups/online_store.dump
 
-2. Проверка архива
-Архив читается pg_restore.
+3. Проверка архива
+Архив успешно прочитан pg_restore.
 
-3. Подготовка чистой БД для восстановления
-Будет пересоздана только БД online_store_restore.
+4. Запуск отдельного сервиса восстановления
+ Network sprint04_database_network  Creating
+ Network sprint04_database_network  Created
+ Volume sprint04_restore_data  Creating
+ Volume sprint04_restore_data  Created
+ Container online-store-restore-1  Recreate
+ Container online-store-restore-1  Recreated
+ Container online-store-restore-1  Starting
+ Container online-store-restore-1  Started
+Ожидание готовности restore...
+Сервис restore готов.
 
-4. Восстановление
+5. Подготовка чистой базы восстановления
+Будет пересоздана только база online_store_restore на сервисе restore.
+Чистая база создана.
+
+6. Восстановление резервной копии
 Восстановление завершено без ошибок.
 
-5. Сравнение количества записей
-Исходная БД:
+7. Сравнение количества записей
+
+Исходная база:
 cart_items|1590
 carts|2001
 categories|23
@@ -31,7 +51,7 @@ products|503
 schema_migrations|1
 sku|2504
 
-Восстановленная БД:
+Восстановленная база:
 cart_items|1590
 carts|2001
 categories|23
@@ -43,15 +63,16 @@ schema_migrations|1
 sku|2504
 Количество записей совпадает во всех 9 таблицах.
 
-6. Сравнение ограничений
-Исходная БД:
+8. Сравнение ограничений
+
+Исходная база:
 c|5
 f|8
 n|42
 p|9
 u|3
 
-Восстановленная БД:
+Восстановленная база:
 c|5
 f|8
 n|42
@@ -59,6 +80,9 @@ p|9
 u|3
 Количество ограничений совпадает.
 
-Резервная копия успешно создана и восстановлена
+--------------------------------------------
+РЕЗУЛЬТАТ: BACKUP И RESTORE УСПЕШНЫ
 Резервная копия: /home/loony/online-store/backups/online_store.dump
-Результаты проверок: /home/loony/online-store/backups/backup_restore.txt
+Результаты проверки: /home/loony/online-store/backups/backup_restore.txt
+Сервис восстановления: restore
+--------------------------------------------

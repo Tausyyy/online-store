@@ -1,5 +1,4 @@
-# Запуск базы данных одной командой:   docker compose up -d
-# Остановить и УДАЛИТЬ данные:         docker compose down -v
+
 services:
   db:
     image: postgres:18
@@ -11,13 +10,43 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql   
-      - ./:/project                 
+      - pgdata:/var/lib/postgresql
+      - ./:/project
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d online_store"]
       interval: 2s
       timeout: 3s
       retries: 30
 
+  restore:
+    image: postgres:18
+    profiles:
+      - restore
+    environment:
+      POSTGRES_DB: ${RESTORE_DB:-online_store_restore}
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER:-postgres}
+      POSTGRES_PASSWORD: ${RESTORE_ADMIN_PASSWORD:?Set RESTORE_ADMIN_PASSWORD in .env}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=trust
+    ports:
+      - "127.0.0.1:${RESTORE_PORT:-55434}:5432"
+    volumes:
+      - restore_data:/var/lib/postgresql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    networks:
+      - database_network
+
 volumes:
   pgdata:
+  restore_data:
+    name: sprint04_restore_data
+
+networks:
+  database_network:
+    name: sprint04_database_network
