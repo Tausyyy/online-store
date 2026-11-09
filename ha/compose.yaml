@@ -1,0 +1,54 @@
+services:
+  # etcd: здесь Patroni записывает, какой узел сейчас primary
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.17
+    command:
+      - /usr/local/bin/etcd
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd:2379
+    volumes:
+      - etcd_data:/etcd-data
+
+  # Два узла PostgreSQL, за каждым следит Patroni
+  patroni1:
+    build: ./patroni
+    hostname: patroni1
+    depends_on:
+      - etcd
+    volumes:
+      - ./patroni/patroni1.yml:/etc/patroni.yml:ro
+      - patroni1_data:/var/lib/postgresql/data
+
+  patroni2:
+    build: ./patroni
+    hostname: patroni2
+    depends_on:
+      - etcd
+    volumes:
+      - ./patroni/patroni2.yml:/etc/patroni.yml:ro
+      - patroni2_data:/var/lib/postgresql/data
+
+  # HAProxy: один адрес для приложения
+  # 5000 - запись (всегда на текущий primary), 5001 - чтение (на replica), 7000 - страница статуса
+  haproxy:
+    image: haproxy:3.0
+    depends_on:
+      - patroni1
+      - patroni2
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "127.0.0.1:55432:5000"
+      - "127.0.0.1:55433:5001"
+      - "127.0.0.1:7000:7000"
+
+  # "Приложение": контейнер с psql, из него ходим в базу через HAProxy
+  client:
+    image: postgres:17-bookworm
+    entrypoint: ["sleep", "infinity"]
+
+volumes:
+  etcd_data:
+  patroni1_data:
+  patroni2_data:

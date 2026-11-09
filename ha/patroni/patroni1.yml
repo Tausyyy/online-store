@@ -1,0 +1,42 @@
+scope: online-store-cluster      # имя кластера (одинаковое у обоих узлов)
+name: patroni1                  # имя узла
+
+restapi:                         # через этот порт HAProxy спрашивает "ты primary?"
+  listen: 0.0.0.0:8008
+  connect_address: patroni1:8008
+
+etcd3:
+  host: etcd:2379
+
+bootstrap:                       # настройки, которые применяются один раз при создании кластера
+  dcs:
+    ttl: 20                      # лидер не отметился 20 секунд - считается упавшим
+    loop_wait: 5                 # как часто Patroni проверяет состояние
+    retry_timeout: 5
+    postgresql:
+      use_pg_rewind: true        # старый primary при возврате сам становится replica
+      parameters:
+        wal_level: replica
+        hot_standby: "on"
+        max_wal_senders: 10
+        max_replication_slots: 10
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: patroni1:5432
+  data_dir: /var/lib/postgresql/data/pgdata
+  bin_dir: /usr/lib/postgresql/17/bin
+  authentication:
+    superuser:
+      username: postgres
+      password: postgres_pass
+    replication:
+      username: replicator
+      password: replica_pass
+  pg_hba:
+    - local all all trust
+    - host replication replicator 0.0.0.0/0 scram-sha-256
+    - host all all 0.0.0.0/0 scram-sha-256

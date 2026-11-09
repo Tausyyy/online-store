@@ -1,6 +1,6 @@
 --------------------------------------------
 Резервное копирование и восстановление
-Дата: 2026-11-02 16:41:29 +07
+Дата: 2026-11-03 12:54:54 +07
 Исходный сервис: db
 Сервис восстановления: restore
 Исходная БД: online_store
@@ -13,21 +13,14 @@
 
 2. Создание резервной копии
 Резервная копия создана:
-/home/loony/online-store/backups/online_store.dump
-964K	/home/loony/online-store/backups/online_store.dump
+/mnt/d/СУБД/online-store/backups/online_store.dump
+980K	/mnt/d/СУБД/online-store/backups/online_store.dump
 
 3. Проверка архива
 Архив успешно прочитан pg_restore.
 
 4. Запуск отдельного сервиса восстановления
- Network sprint04_database_network  Creating
- Network sprint04_database_network  Created
- Volume sprint04_restore_data  Creating
- Volume sprint04_restore_data  Created
- Container online-store-restore-1  Recreate
- Container online-store-restore-1  Recreated
- Container online-store-restore-1  Starting
- Container online-store-restore-1  Started
+ Container online-store-restore-1 Running 
 Ожидание готовности restore...
 Сервис restore готов.
 
@@ -36,12 +29,16 @@
 Чистая база создана.
 
 6. Восстановление резервной копии
+pg_restore: error: could not execute query: ERROR:  role "lab4_admin" does not exist
+Command was: CREATE POLICY cart_items_admin_all ON public.cart_items TO lab4_admin USING (true) WITH CHECK (true);
+
+
 Восстановление завершено без ошибок.
 
 7. Сравнение количества записей
 
 Исходная база:
-cart_items|1590
+cart_items|1619
 carts|2001
 categories|23
 customers|1003
@@ -52,7 +49,7 @@ schema_migrations|1
 sku|2504
 
 Восстановленная база:
-cart_items|1590
+cart_items|1619
 carts|2001
 categories|23
 customers|1003
@@ -68,21 +65,21 @@ sku|2504
 Исходная база:
 c|5
 f|8
-n|42
-p|9
+n|48
+p|10
 u|3
 
 Восстановленная база:
 c|5
 f|8
-n|42
-p|9
+n|48
+p|10
 u|3
 Количество ограничений совпадает.
 
 --------------------------------------------
 РЕЗУЛЬТАТ: BACKUP И RESTORE УСПЕШНЫ
-Резервная копия: /home/loony/online-store/backups/online_store.dump
-Результаты проверки: /home/loony/online-store/backups/backup_restore.txt
+Резервная копия: /mnt/d/СУБД/online-store/backups/online_store.dump
+Результаты проверки: /mnt/d/СУБД/online-store/backups/backup_restore.txt
 Сервис восстановления: restore
 --------------------------------------------

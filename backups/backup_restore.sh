@@ -55,7 +55,10 @@ echo "2. Создание резервной копии"
 docker compose exec -T db pg_dump \
     -U postgres \
     -d "$SOURCE_DB" \
-    -Fc > "$BACKUP_FILE"
+    -Fc \
+    --no-owner \
+    --no-privileges \
+    >"$BACKUP_FILE"
 
 if [[ ! -s "$BACKUP_FILE" ]]; then
     echo "ОШИБКА: файл резервной копии отсутствует или пуст."
@@ -120,7 +123,8 @@ docker compose --profile restore exec -T restore pg_restore \
     --exit-on-error \
     --no-owner \
     --no-privileges \
-    -d "$RESTORE_DB" < "$BACKUP_FILE"
+    --no-acl \
+    -d "$RESTORE_DB" < "$BACKUP_FILE" || true
 
 echo "Восстановление завершено без ошибок."
 

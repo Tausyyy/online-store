@@ -1260,7 +1260,10 @@
          133 | gdev_customer_130@example.test |           11
 (796 rows)
 
- product_name | size | color | stock_quantity 
---------------+------+-------+----------------
-(0 rows)
+  product_name  | size | color | stock_quantity 
+----------------+------+-------+----------------
+ Classic Hoodie | M    | Gray  |             10
+ Basic T-Shirt  | L    | White |             15
+ Basic T-Shirt  | M    | Black |             20
+(3 rows)
 
