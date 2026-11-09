@@ -1,0 +1,16 @@
+{
+	"name": "online-store-mongodb-model",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "MongoDB collection model for the online store",
+	"scripts": {
+		"check": "node --check collections.js && node --check demo.js && node --check benchmark.js",
+		"model": "node collections.js",
+		"demo": "node demo.js",
+		"benchmark": "node benchmark.js"
+	},
+	"dependencies": {
+		"mongodb": "^6.21.0"
+	}
+}
