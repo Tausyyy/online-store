@@ -1,0 +1,15 @@
+{
+	"name": "online-store-mongodb-operations",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "CRUD operations and schema validation for the online store MongoDB part",
+	"scripts": {
+		"validate": "node validation.js",
+		"crud": "node crud.js",
+		"check": "node --check validation.js && node --check crud.js"
+	},
+	"dependencies": {
+		"mongodb": "^6.21.0"
+	}
+}

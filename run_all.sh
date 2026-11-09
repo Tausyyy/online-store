@@ -23,8 +23,8 @@ $PSQL -f /project/migrations/001_add_constraints.up.sql
 echo "[3/11] Небольшой набор данных data/data.sql"
 $PSQL -f /project/data/data.sql
 
-echo "[4/11] Генератор: seed=42, 100000 строк в order_items"
-$PSQL -v tag=dev -v seed=42 -v order_items_count=100000 \
+echo "[4/11] Генератор: seed=52, 100000 строк в order_items"
+$PSQL -v tag=dev -v seed=52 -v order_items_count=100000 \
     -f /project/scripts/data_generator/generate_data.sql
 
 echo "[5/11] Тесты ограничений (на временной базе)"
